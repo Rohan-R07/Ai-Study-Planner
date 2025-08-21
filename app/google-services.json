@@ -12,7 +12,20 @@
           "package_name": "com.example.aistudyplanner"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1054936569995-uiooh85q52hfbuk0tscdrk612ooa0pvr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.aistudyplanner",
+            "certificate_hash": "f054629f2ea63884d3e1585ec2f8039f28872f3f"
+          }
+        },
+        {
+          "client_id": "1054936569995-9d8cs59rdc42421ttjtv7t1pdsrflqat.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyC8I037yQQ2FDJVgg18AYAeMR-B46lnbpk"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1054936569995-9d8cs59rdc42421ttjtv7t1pdsrflqat.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
