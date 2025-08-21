@@ -1,12 +1,14 @@
 package com.example.aistudyplanner
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +29,7 @@ import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.aistudyplanner.Gemini.GeminiViewModel
+import com.example.aistudyplanner.OnBoarding.HorizontalPagerWithSmoothDots
 import com.example.aistudyplanner.ui.theme.AIStudyPlannerTheme
 
 class MainActivity : ComponentActivity() {
@@ -40,72 +43,82 @@ class MainActivity : ComponentActivity() {
             AIStudyPlannerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding),
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
 
-                        Text(
-                            text = "AI Study Planner",
-                            modifier = Modifier.padding(20.dp),
-                            style = androidx.compose.material3.MaterialTheme.typography.headlineLarge
-                        )
-
-                        Spacer(Modifier.padding(20.dp))
-
-                        val isLoading = viewModel.value.isLoading.collectAsState()
-
-                        val prompt = remember { mutableStateOf("") }
-
-                        TextField(
-                            value = prompt.value,
-                            onValueChange = {
-                                prompt.value = it
-                            },
-                            modifier = Modifier
-                                .padding(20.dp)
-                                .fillMaxWidth(),
-                            placeholder = { Text("Enter your prompt here") }
-                        )
-
-                        Button(
-                            onClick = {
-                                viewModel.value.sendPrompt(prompt.value)
-                            }
-                        ) {
-                            Text("Send Prompt")
-                        }
-
-                        Spacer(Modifier.padding(20.dp))
-
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-
-                            item {
-
-                                if (isLoading.value) {
-                                    CircularProgressIndicator()
-                                } else {
-                                    Text(
-                                        text = viewModel.value.repllyFromAI.collectAsState().value,
-                                        modifier = Modifier.padding(20.dp),
-                                        style = androidx.compose.material3.MaterialTheme.typography.bodyLarge
-                                    )
-                                }
-                            }
-
-                        }
-
-                    }
+                    HorizontalPagerWithSmoothDots()
                 }
             }
         }
     }
+}
+
+
+@Composable
+fun MainUI(innerPadding: PaddingValues, viewModel: GeminiViewModel) {
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Text(
+            text = "AI Study Planner",
+            modifier = Modifier.padding(20.dp),
+            style = androidx.compose.material3.MaterialTheme.typography.headlineLarge
+        )
+
+        Spacer(Modifier.padding(20.dp))
+
+        val isLoading = viewModel.isLoading.collectAsState()
+
+        val prompt = remember { mutableStateOf("") }
+
+        TextField(
+            value = prompt.value,
+            onValueChange = {
+                prompt.value = it
+            },
+            modifier = Modifier
+                .padding(20.dp)
+                .fillMaxWidth(),
+            placeholder = { Text("Enter your prompt here") }
+        )
+
+
+        Button(
+            onClick = {
+                viewModel.sendPrompt(prompt.value)
+            }
+        ) {
+            Text("Send Prompt")
+        }
+
+        Spacer(Modifier.padding(20.dp))
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            item {
+
+                if (isLoading.value) {
+                    CircularProgressIndicator()
+                } else {
+                    Text(
+                        text = viewModel.repllyFromAI.collectAsState().value,
+                        modifier = Modifier.padding(20.dp),
+                        style = androidx.compose.material3.MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+
+        }
+
+    }
+
 }
