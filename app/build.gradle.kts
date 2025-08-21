@@ -52,6 +52,10 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.firebase.ai)
     implementation(libs.firebase.appcheck.debug)
+    implementation(libs.firebase.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -65,5 +69,13 @@ dependencies {
     implementation(libs.material3)
 
 
+// For lifecycleScope in Activity and Fragment
+    implementation(libs.androidx.lifecycle.runtime.ktx.v280)
+// or latest
+// (Optional) ViewModel & LiveData if you're using them
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
 
+    implementation(libs.androidx.lifecycle.viewmodel.ktx.v292)
+// or latest
 }

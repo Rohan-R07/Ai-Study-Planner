@@ -28,6 +28,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.example.aistudyplanner.FirebaseAuth.FirebaseAuthViewModel
 import com.example.aistudyplanner.Gemini.GeminiViewModel
 import com.example.aistudyplanner.OnBoarding.HorizontalPagerWithSmoothDots
 import com.example.aistudyplanner.ui.theme.AIStudyPlannerTheme
@@ -36,7 +39,20 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val viewModel = viewModels<GeminiViewModel>()
+        val geminiViewModel = viewModels<GeminiViewModel>()
+
+        val googleViewModel = viewModels<FirebaseAuthViewModel>(
+            factoryProducer = {
+                object : ViewModelProvider.Factory{
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                        return FirebaseAuthViewModel(
+                            applicationContext
+                        )
+                        as T
+                    }
+                }
+            }
+        )
 
         enableEdgeToEdge()
         setContent {
@@ -44,7 +60,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
 
-                    HorizontalPagerWithSmoothDots()
+                    HorizontalPagerWithSmoothDots(googleViewModel.value)
                 }
             }
         }

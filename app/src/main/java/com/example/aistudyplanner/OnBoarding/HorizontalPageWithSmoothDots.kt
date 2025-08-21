@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.aistudyplanner.FirebaseAuth.FirebaseAuthViewModel
 import com.example.aistudyplanner.ui.theme.CBackground
 import com.example.aistudyplanner.ui.theme.CDotFocusedColor
 import com.example.aistudyplanner.ui.theme.CDotUnFocusedColour
@@ -27,7 +28,7 @@ import com.example.aistudyplanner.ui.theme.CDotUnFocusedColour
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HorizontalPagerWithSmoothDots() {
+fun HorizontalPagerWithSmoothDots(viewModel: FirebaseAuthViewModel) {
     val pageCount = 3 // Number of pages in the pager
     // Create a PagerState with the initial page and page count
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { pageCount })
@@ -77,7 +78,7 @@ fun HorizontalPagerWithSmoothDots() {
             when (page) {
                 0 -> OnBoardingScreen1(pagerState, page)
                 1 -> OnBoardingScreen2(pagerState, page)
-                2 -> OnBoardingScreen3(pagerState, page)
+                2 -> OnBoardingScreen3(viewModel)
 
 
             }
