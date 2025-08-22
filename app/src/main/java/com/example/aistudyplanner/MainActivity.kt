@@ -30,8 +30,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation3.runtime.rememberNavBackStack
 import com.example.aistudyplanner.FirebaseAuth.FirebaseAuthViewModel
 import com.example.aistudyplanner.Gemini.GeminiViewModel
+import com.example.aistudyplanner.MainNavigation.MRoutes
+import com.example.aistudyplanner.MainNavigation.MainNavigation
 import com.example.aistudyplanner.OnBoarding.HorizontalPagerWithSmoothDots
 import com.example.aistudyplanner.ui.theme.AIStudyPlannerTheme
 
@@ -43,12 +46,12 @@ class MainActivity : ComponentActivity() {
 
         val googleViewModel = viewModels<FirebaseAuthViewModel>(
             factoryProducer = {
-                object : ViewModelProvider.Factory{
+                object : ViewModelProvider.Factory {
                     override fun <T : ViewModel> create(modelClass: Class<T>): T {
                         return FirebaseAuthViewModel(
                             applicationContext
                         )
-                        as T
+                                as T
                     }
                 }
             }
@@ -57,10 +60,15 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AIStudyPlannerTheme {
+                val mainNavBackStack = rememberNavBackStack<MRoutes>(MRoutes.SplashScreen)
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
 
-                    HorizontalPagerWithSmoothDots(googleViewModel.value)
+                    MainNavigation(
+                        mainNavBackStack,
+                        googleViewModel.value,
+                        innerPadding
+                    )
                 }
             }
         }

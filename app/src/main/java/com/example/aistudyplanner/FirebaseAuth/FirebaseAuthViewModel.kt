@@ -37,16 +37,32 @@ class FirebaseAuthViewModel(context: Context) : ViewModel() {
         return googleSignInClient.isSingedIn()
     }
 
-    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-    fun signInWithGoogle() {
-        viewModelScope.launch {
-            _isLoading.value = true
-            isSucess.value = googleSignInClient.signIn()
-            // Make sure this returns a Boolean or a result
+//    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+//    fun signInWithGoogle() : Boolean{
+//        viewModelScope.launch {
+//            _isLoading.value = true
+//            isSucess.value = googleSignInClient.signIn()
+//            // Make sure this returns a Boolean or a result
+//
+//            println("GoogleSignInClient: isSuccessful: ${isSucess.value}")
+//            _isLoading.value = false
+//        }
+//
+//        if (isSucess.value){
+//            return true
+//        }
+//        else
+//            return false
+//    }
 
-            println("GoogleSignInClient: isSuccessful: ${isSucess.value}")
-            _isLoading.value = false
-        }
+
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    suspend fun signInWithGoogle(): Boolean {
+        _isLoading.value = true
+        val result = googleSignInClient.signIn() // This is already suspend
+        isSucess.value = result
+        _isLoading.value = false
+        return result
     }
 
 
