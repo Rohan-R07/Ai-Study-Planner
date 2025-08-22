@@ -1,6 +1,7 @@
 package com.example.aistudyplanner.OnBoarding
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,6 +19,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,14 +38,17 @@ import com.example.aistudyplanner.ui.theme.CDotFocusedColor
 import com.example.aistudyplanner.ui.theme.SignInWIthEmail
 import com.example.aistudyplanner.ui.theme.SignInWithGoogle
 import com.google.firebase.ai.type.content
+import com.google.firebase.logger.Logger
 
 
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 fun OnBoardingScreen3(viewModel: FirebaseAuthViewModel) {
 
+//    val isLoading = viewModel.isSuccessful.collectAsState()
+//    val isLoggedIn = viewModel.currentUser?.email?.isNotEmpty()
 
-
+    val isLoggedIn = viewModel.isSucess.collectAsState()
     Column(
         modifier = Modifier
             .background(CBackground)
@@ -62,7 +67,8 @@ fun OnBoardingScreen3(viewModel: FirebaseAuthViewModel) {
 
         Spacer(Modifier.padding(15.dp))
 
-        Text("Sign in to continue your learning journey",
+        Text(
+            "Sign in to continue your learning journey",
             style = MaterialTheme.typography.bodyLarge,
             color = Color.White,
             modifier = Modifier.fillMaxWidth(),
@@ -86,7 +92,18 @@ fun OnBoardingScreen3(viewModel: FirebaseAuthViewModel) {
 
         Button(
             onClick = {
-                viewModel.SignInWithGoogle()
+                viewModel.signInWithGoogle()
+                if (isLoggedIn.value) {
+
+                    //            Log.d("GoogleSignIN","Woring properly")
+
+                    // Naviation to be done here
+
+                    println("GoogleSignIfffffNClient: working Properly")
+                } else  {
+//            Log.d("GoogleSignIN","Not working properly")
+                    println("GoogleSignINfffClient: No working proplery")
+                }
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor = SignInWithGoogle,
@@ -107,7 +124,8 @@ fun OnBoardingScreen3(viewModel: FirebaseAuthViewModel) {
 
         Spacer(Modifier.padding(10.dp))
 
-        Text("By Continuing. you agree to our Terms of Serivces and Privacy Policy",
+        Text(
+            "By Continuing. you agree to our Terms of Serivces and Privacy Policy",
             color = CDotFocusedColor.copy(0.6f),
             modifier = Modifier
                 .padding(10.dp)

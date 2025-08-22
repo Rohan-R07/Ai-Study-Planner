@@ -3,10 +3,15 @@ package com.example.aistudyplanner.FirebaseAuth
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.util.fastCbrt
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
 class FirebaseAuthViewModel(context: Context) : ViewModel() {
@@ -19,19 +24,34 @@ class FirebaseAuthViewModel(context: Context) : ViewModel() {
 
     val currentUser = Auth.currentUser
 
+    private var _isSucessfull = googleSignInClient.isSuceessFullLogin.value
+
+    val isSucess = MutableStateFlow<Boolean>(false)
+
+    // State for loading and login success
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
+
     fun isSignedIn(): Boolean {
         return googleSignInClient.isSingedIn()
     }
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-    fun SignInWithGoogle() {
+    fun signInWithGoogle() {
         viewModelScope.launch {
-            googleSignInClient.signIn()
+            _isLoading.value = true
+            isSucess.value = googleSignInClient.signIn()
+            // Make sure this returns a Boolean or a result
+
+            println("GoogleSignInClient: isSuccessful: ${isSucess.value}")
+            _isLoading.value = false
         }
     }
 
 
     fun googleSignOut() {
         Auth.signOut()
+        _isSucessfull = false
     }
 }
