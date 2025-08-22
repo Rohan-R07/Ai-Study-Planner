@@ -3,6 +3,7 @@ package com.example.aistudyplanner.FirebaseAuth
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.mutableStateOf
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
@@ -29,7 +30,7 @@ class GoogleSignInClient(
 
     private val credentialManager = CredentialManager.create(context)
 
-    val isSuceessFullLogin = MutableStateFlow<Boolean>(false)
+    val isSuceessFullLogin = mutableStateOf<Boolean>(false)
 
 
     fun isSingedIn(): Boolean {
@@ -40,21 +41,29 @@ class GoogleSignInClient(
 
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-    suspend fun signIn() {
+    suspend fun signIn(): Boolean {
+
+        if (isSingedIn()){
+            return true
+        }
+
 
         try {
             val result = buildCredentialRquest()
             return handleSignIn(result)
 
+            isSuceessFullLogin.value = true
 
         } catch (e: Exception) {
             if (e is CancellationException) throw e
             println("$tag error occured ${e.message}")
 
+//            isSuceessFullLogin.apply {  }
+            return false
         }
     }
 
-    private suspend fun handleSignIn(result: GetCredentialResponse) {
+    private suspend fun handleSignIn(result: GetCredentialResponse) : Boolean{
         val credential = result.credential
 
         if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
@@ -65,7 +74,7 @@ class GoogleSignInClient(
                 println(tag + "email: ${tokenCredential.id}")
                 println(tag + "Picture: ${tokenCredential.profilePictureUri}")
 
-                isSuceessFullLogin.value = !isSuceessFullLogin.value
+                isSuceessFullLogin.value = true
 
                 val authCredential = GoogleAuthProvider.getCredential(tokenCredential.idToken, null)
 
@@ -73,14 +82,17 @@ class GoogleSignInClient(
 
                 val authResult = auth.signInWithCredential(authCredential).await()
 
+                return authResult.user != null
+
+
             } catch (e: GoogleIdTokenParsingException) {
                 println(tag + e.message)
-
+                return false
             }
         } else {
             println(tag + "Credentail is not GoogleIdTokenCrednetial")
-            isSuceessFullLogin.value = !isSuceessFullLogin.value
-
+            isSuceessFullLogin.value = false
+            return false
         }
     }
 
