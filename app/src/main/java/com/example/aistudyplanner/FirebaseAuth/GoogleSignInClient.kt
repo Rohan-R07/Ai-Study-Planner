@@ -50,15 +50,14 @@ class GoogleSignInClient(
 
         try {
             val result = buildCredentialRquest()
+            isSuceessFullLogin.value = true
+
             return handleSignIn(result)
 
-            isSuceessFullLogin.value = true
 
         } catch (e: Exception) {
             if (e is CancellationException) throw e
             println("$tag error occured ${e.message}")
-
-//            isSuceessFullLogin.apply {  }
             return false
         }
     }

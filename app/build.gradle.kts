@@ -3,6 +3,9 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
+
+    alias(libs.plugins.jetbrains.kotlin.serialization)
+
 }
 
 android {
@@ -56,6 +59,7 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+    implementation(libs.lifecycle.viewmodel.navigation3)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -77,5 +81,11 @@ dependencies {
     implementation(libs.androidx.lifecycle.livedata.ktx)
 
     implementation(libs.androidx.lifecycle.viewmodel.ktx.v292)
-// or latest
+// or latestimplementation(libs.kotlinx.serialization.core)
+//  implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.navigation3.runtime.v100alpha07)
+    implementation(libs.androidx.navigation3.ui.v100alpha07)
+
+    implementation(libs.kotlinx.serialization.core)
+    implementation(libs.kotlinx.serialization.json)
 }

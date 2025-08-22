@@ -7,6 +7,9 @@ pluginManagement {
                 includeGroupByRegex("androidx.*")
             }
         }
+//        maven {
+//            url = uri("https://androidx.dev/snapshots/builds/[buildId]/artifacts/repository")
+//        }
         mavenCentral()
         gradlePluginPortal()
     }
