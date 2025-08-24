@@ -1,7 +1,6 @@
 package com.example.aistudyplanner
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -25,8 +24,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -35,7 +32,6 @@ import com.example.aistudyplanner.FirebaseAuth.FirebaseAuthViewModel
 import com.example.aistudyplanner.Gemini.GeminiViewModel
 import com.example.aistudyplanner.MainNavigation.MRoutes
 import com.example.aistudyplanner.MainNavigation.MainNavigation
-import com.example.aistudyplanner.OnBoarding.HorizontalPagerWithSmoothDots
 import com.example.aistudyplanner.ui.theme.AIStudyPlannerTheme
 
 class MainActivity : ComponentActivity() {
@@ -134,7 +130,7 @@ fun MainUI(innerPadding: PaddingValues, viewModel: GeminiViewModel) {
                     CircularProgressIndicator()
                 } else {
                     Text(
-                        text = viewModel.repllyFromAI.collectAsState().value,
+                        text = viewModel.tipReply.collectAsState().value,
                         modifier = Modifier.padding(20.dp),
                         style = androidx.compose.material3.MaterialTheme.typography.bodyLarge
                     )

@@ -12,6 +12,6 @@ interface MRoutes : NavKey {
     data object OnBoardingScreen : MRoutes
 
     @Serializable
-    data object HomeScreen : MRoutes
+    data object MainScreen : MRoutes
 
 }

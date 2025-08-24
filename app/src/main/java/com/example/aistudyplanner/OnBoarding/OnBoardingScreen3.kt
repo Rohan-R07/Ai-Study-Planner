@@ -17,6 +17,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -65,7 +66,7 @@ fun OnBoardingScreen3(viewModel: FirebaseAuthViewModel, mainNavBackStack: NavBac
 
     Log.d("GoogleSignINClient", isLoggedIn.value.toString())
 
-    val googleSIgnInState = remember { mutableStateOf(false) }
+    val isLoading = viewModel._isLoading.collectAsState().value
 
     val courutine = rememberCoroutineScope()
     Column(
@@ -112,16 +113,13 @@ fun OnBoardingScreen3(viewModel: FirebaseAuthViewModel, mainNavBackStack: NavBac
 
         Button(
             onClick = {
-
-
                 courutine.launch {
                     val success = viewModel.signInWithGoogle()
                     if (success) {
                         mainNavBackStack.clear()
-                        mainNavBackStack.add(MRoutes.HomeScreen)
+                        mainNavBackStack.add(MRoutes.MainScreen)
                     }
                 }
-
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor = SignInWithGoogle,
@@ -135,18 +133,13 @@ fun OnBoardingScreen3(viewModel: FirebaseAuthViewModel, mainNavBackStack: NavBac
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.White
             )
-
-
         }
-
-
-//        if (googleSIgnInState.value){
-//
-//        }
-
 
     }
 
+    if (isLoading){
+        CircularProgressIndicator()
+    }
 
     Spacer(Modifier.padding(10.dp))
 

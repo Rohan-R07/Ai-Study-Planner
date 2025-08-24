@@ -92,4 +92,9 @@ dependencies {
 
     implementation(libs.lottie.compose) // Latest stable
 
+    implementation(libs.androidx.material.icons.core)
+
+
+    implementation(libs.androidx.material3.v140alpha14)
+
 }

@@ -29,31 +29,7 @@ class FirebaseAuthViewModel(context: Context) : ViewModel() {
     val isSucess = MutableStateFlow<Boolean>(false)
 
     // State for loading and login success
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
-
-
-    fun isSignedIn(): Boolean {
-        return googleSignInClient.isSingedIn()
-    }
-
-//    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-//    fun signInWithGoogle() : Boolean{
-//        viewModelScope.launch {
-//            _isLoading.value = true
-//            isSucess.value = googleSignInClient.signIn()
-//            // Make sure this returns a Boolean or a result
-//
-//            println("GoogleSignInClient: isSuccessful: ${isSucess.value}")
-//            _isLoading.value = false
-//        }
-//
-//        if (isSucess.value){
-//            return true
-//        }
-//        else
-//            return false
-//    }
+     val _isLoading = MutableStateFlow(true)
 
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
