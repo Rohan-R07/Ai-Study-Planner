@@ -1,6 +1,5 @@
 package com.example.aistudyplanner.Gemini
 
-import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
@@ -16,7 +15,7 @@ class GeminiViewModel : ViewModel() {
     )
         .generativeModel("gemini-1.5-flash")
 
-    val repllyFromAI = MutableStateFlow<String>("")
+    val tipReply = MutableStateFlow<String>("")
 
     val isLoading = MutableStateFlow<Boolean>(false)
 
@@ -28,7 +27,7 @@ class GeminiViewModel : ViewModel() {
 
             viewModelScope.launch {
                 val response = model.generateContent(prompt)
-                repllyFromAI.value = response.text.toString()
+                tipReply.value = response.text.toString()
 
                 if (response.text.toString().isNotEmpty()){
                     isLoading.value = false
@@ -37,15 +36,37 @@ class GeminiViewModel : ViewModel() {
                     isLoading.value = false
                 }
             }
-
         }
         catch (e: Exception){
-
             isError.value = e.message.toString()
             isLoading.value = true
-
         }
+    }
 
+    val AiTipofTheDay = MutableStateFlow<String>("")
+    val tipLoading = MutableStateFlow<Boolean>(false)
+
+    fun aiTipOfTheDay(){
+        tipLoading.value = true
+
+        try {
+
+            viewModelScope.launch {
+                val aiResponse = model.generateContent("Generate a short, actionable 'Tip of the Day' for students using AI to improve their learning or productivity and to motivate them for more Studying. Keep it under 25 words, friendly, and concise. Avoid complex sentences. Example: 'Use AI to summarize your study materials and generate quizzes to test your knowledge.' Return only the tip text, no extra commentary.")
+                tipReply.value = aiResponse.text.toString()
+
+                if (aiResponse.text.toString().isNotEmpty()){
+                    tipLoading.value = false
+
+                } else {
+                    tipLoading.value = false
+                }
+            }
+        }
+        catch (e: Exception){
+            isError.value = e.message.toString()
+            tipLoading.value = true
+        }
 
     }
 

@@ -88,4 +88,13 @@ dependencies {
 
     implementation(libs.kotlinx.serialization.core)
     implementation(libs.kotlinx.serialization.json)
+
+
+    implementation(libs.lottie.compose) // Latest stable
+
+    implementation(libs.androidx.material.icons.core)
+
+
+    implementation(libs.androidx.material3.v140alpha14)
+
 }

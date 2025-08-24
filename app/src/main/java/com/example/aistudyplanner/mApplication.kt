@@ -12,22 +12,46 @@ class mApplication: Application() {
         super.onCreate()
 
 
+//        FirebaseApp.initializeApp(this)
+//
+//
+//        val providerFactory = DebugAppCheckProviderFactory.getInstance()
+//        FirebaseAppCheck.getInstance().installAppCheckProviderFactory(providerFactory)
+//
+//
+//
+//        if (BuildConfig.DEBUG) {
+//            FirebaseAppCheck.getInstance().installAppCheckProviderFactory(
+//                DebugAppCheckProviderFactory.getInstance()
+//            )
+//        }
+
+        FirebaseAppCheck.getInstance()
+            .installAppCheckProviderFactory(DebugAppCheckProviderFactory.getInstance())
+//        if (BuildConfig.DEBUG) {
+//            FirebaseAppCheck.getInstance()
+//                .installAppCheckProviderFactory(
+//                    DebugAppCheckProviderFactory.getInstance()
+        FirebaseAppCheck.getInstance().getToken(false)
+            .addOnSuccessListener { tokenResult ->
+                val token = tokenResult.token
+                // Add token to your Gemini API header
+            }
         FirebaseApp.initializeApp(this)
-
-
-        val providerFactory = DebugAppCheckProviderFactory.getInstance()
-        FirebaseAppCheck.getInstance().installAppCheckProviderFactory(providerFactory)
-
-
+//                )
+//        }
+        val appCheck = FirebaseAppCheck.getInstance()
+        appCheck.installAppCheckProviderFactory(
+            DebugAppCheckProviderFactory.getInstance()
+        )
 
         if (BuildConfig.DEBUG) {
-            FirebaseAppCheck.getInstance().installAppCheckProviderFactory(
-                DebugAppCheckProviderFactory.getInstance()
-            )
+            val providerFactory = DebugAppCheckProviderFactory.getInstance()
+            FirebaseAppCheck.getInstance().installAppCheckProviderFactory(providerFactory)
         }
-
-
     }
+
+
 
 
 
