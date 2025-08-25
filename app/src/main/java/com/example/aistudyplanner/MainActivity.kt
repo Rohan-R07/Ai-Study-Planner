@@ -62,8 +62,9 @@ class MainActivity : ComponentActivity() {
 
                     MainNavigation(
                         mainNavBackStack,
+                        applicationContext,
                         googleViewModel.value,
-                        innerPadding
+                        innerPadding,
                     )
                 }
             }

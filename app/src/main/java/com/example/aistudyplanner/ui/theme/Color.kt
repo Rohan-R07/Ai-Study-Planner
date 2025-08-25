@@ -19,3 +19,4 @@ val CDotUnFocusedColour = Color(0xFF633069)
 val SignInWIthEmail = Color(0xFF45214A)
 
 val SignInWithGoogle = Color(0xFFE53DF5)
+val BottomNavBarColor = Color(0xFF331733)
