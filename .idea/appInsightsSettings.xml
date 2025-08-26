@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.example.aistudyplanner" />
+                  <option name="mobileSdkAppId" value="1:1054936569995:android:ef84fabfa43fb904541c8e" />
+                  <option name="projectId" value="ai-study-planner-e32ff" />
+                  <option name="projectNumber" value="1054936569995" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

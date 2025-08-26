@@ -55,6 +55,7 @@ import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.Unspecified
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -66,6 +67,7 @@ import com.example.aistudyplanner.BottomNavigation.BotttomNavGrpah
 import com.example.aistudyplanner.BottomNavigation.bottomNavBarItems
 import com.example.aistudyplanner.FirebaseAuth.FirebaseAuthViewModel
 import com.example.aistudyplanner.Gemini.GeminiViewModel
+import com.example.aistudyplanner.R
 import com.example.aistudyplanner.Utils.AiTipCard
 import com.example.aistudyplanner.Utils.ExpandableFloatingActionButton
 import com.example.aistudyplanner.Utils.FabAction
@@ -100,13 +102,13 @@ fun MainScreens(
 
             ExpandableFloatingActionButton(
                 fabActions = listOf(
-                    FabAction(Icons.Default.Phone, "Summarize from Youtube"){
+                    FabAction(painterResource(R.drawable.youtube_icon), "Summarize from Youtube"){
                         context.startActivity(intent)
                     },
-                    FabAction(Icons.Default.Edit, "Summarize with PDFs"){
+                    FabAction(painterResource(R.drawable.pdf_image), "Summarize with PDFs"){
 
                     },
-                    FabAction(Icons.Default.Menu, "Create an Ai Quizz"){
+                    FabAction(painterResource(R.drawable.quizz_icon), "Create an Ai Quizz"){
 
                     }
                 ),

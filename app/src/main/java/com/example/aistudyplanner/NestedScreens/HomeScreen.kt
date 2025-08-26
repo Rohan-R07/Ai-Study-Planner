@@ -99,18 +99,6 @@ fun HomeScreen(bBackStack: NavBackStack) {
 
             val isListEmpty = placeholderList.isEmpty()
 
-//            if (isListEmpty) {  // TODO add recents list
-//                Box(
-//                    modifier = Modifier
-//                        .background(Red)
-//                        .size(30.dp),
-//                    contentAlignment = Alignment.Center,
-//
-//                    ) {
-//
-//                }
-//            } else {
-
 
             LazyColumn(
                 modifier = Modifier
