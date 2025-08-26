@@ -1,5 +1,6 @@
 package com.example.aistudyplanner.MainNavigation
 
+import android.content.Context
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -20,7 +21,7 @@ import com.example.aistudyplanner.Screeens.MainScreens
 import com.example.aistudyplanner.Screeens.SplashScreen
 
 @Composable
-fun MainNavigation(mainNavbackStack: NavBackStack, firebaseAuthViewModel: FirebaseAuthViewModel, innerpadding: PaddingValues) {
+fun MainNavigation(mainNavbackStack: NavBackStack,context: Context, firebaseAuthViewModel: FirebaseAuthViewModel, innerpadding: PaddingValues) {
 
 
     NavDisplay(
@@ -67,6 +68,7 @@ fun MainNavigation(mainNavbackStack: NavBackStack, firebaseAuthViewModel: Fireba
                 MainScreens(
                     firebaseAuthViewModel = firebaseAuthViewModel,
                     mainNavbackStack = mainNavbackStack,
+                    context
                 )
             }
         }

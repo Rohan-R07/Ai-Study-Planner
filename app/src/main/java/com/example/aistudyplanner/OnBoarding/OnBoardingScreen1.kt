@@ -1,10 +1,8 @@
 package com.example.aistudyplanner.OnBoarding
 
 
-import android.widget.Space
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,16 +20,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.aistudyplanner.R
-import com.example.aistudyplanner.Uitls.SwipeButton
-import com.example.aistudyplanner.ui.theme.CDotFocusedColor
-import kotlinx.coroutines.launch
-import kotlin.random.Random
+import com.example.aistudyplanner.Utils.SwipeButton
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
