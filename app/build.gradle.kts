@@ -97,4 +97,10 @@ dependencies {
 
     implementation(libs.androidx.material3.v140alpha14)
 
+    // transcribe
+
+    implementation(libs.okhttp)
+    implementation(libs.json)
+    implementation(libs.jsoup)
+
 }
