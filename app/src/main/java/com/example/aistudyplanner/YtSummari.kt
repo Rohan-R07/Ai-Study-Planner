@@ -62,7 +62,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Gray
+import androidx.compose.ui.graphics.Color.Companion.Unspecified
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -79,7 +81,15 @@ class YtSummari : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val geminiViewModel = viewModels<GeminiViewModel>()
+        val geminiViewModel = viewModels<GeminiViewModel>(
+            factoryProducer = {
+                object : androidx.lifecycle.ViewModelProvider.Factory {
+                    override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                        return GeminiViewModel(applicationContext) as T
+                    }
+                }
+            }
+        )
 
         enableEdgeToEdge()
         setContent {
@@ -361,7 +371,19 @@ class YtSummari : ComponentActivity() {
 //                                            Text("Copy")
 //                                        }
 
+                                        // download button could be added here
+                                        IconButton(
+                                            onClick = {}
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.download_icon),
+                                                contentDescription = "Download",
+                                                tint = Unspecified,
+                                            )
+                                        }
+
                                         // Copy button
+
                                         TextButton(
                                             onClick = {
                                                 if (summary.isNotEmpty()) {

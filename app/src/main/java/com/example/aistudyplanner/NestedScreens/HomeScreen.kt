@@ -1,5 +1,6 @@
 package com.example.aistudyplanner.NestedScreens
 
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +37,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavBackStack
 import com.example.aistudyplanner.BottomNavigation.BRoutes
@@ -48,12 +51,7 @@ import com.example.aistudyplanner.ui.theme.CBackground
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun HomeScreen(bBackStack: NavBackStack) {
-
-
-    val geminiViewModel = viewModel<GeminiViewModel>()
-
-//    geminiViewModel.aiTipOfTheDay()
+fun HomeScreen(bBackStack: NavBackStack,geminiViewModel: GeminiViewModel) {
 
 
     val tipResponse = geminiViewModel.tipReply.collectAsState()

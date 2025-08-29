@@ -38,8 +38,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val geminiViewModel = viewModels<GeminiViewModel>()
-
+        val geminiViewModel = viewModels<GeminiViewModel>(
+            factoryProducer = {
+                object : androidx.lifecycle.ViewModelProvider.Factory {
+                    override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                        return GeminiViewModel(applicationContext) as T
+                    }
+                }
+            }
+        )
         val googleViewModel = viewModels<FirebaseAuthViewModel>(
             factoryProducer = {
                 object : ViewModelProvider.Factory {
@@ -65,6 +72,7 @@ class MainActivity : ComponentActivity() {
                         applicationContext,
                         googleViewModel.value,
                         innerPadding,
+                        geminiViewModel.value
                     )
                 }
             }

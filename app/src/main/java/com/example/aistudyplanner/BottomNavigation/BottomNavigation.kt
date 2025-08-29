@@ -27,7 +27,7 @@ import com.example.aistudyplanner.Screeens.SplashScreen
 
 
 @Composable
-fun BotttomNavGrpah(bbackstack: NavBackStack, firebaseAuthViewModel: FirebaseAuthViewModel,innerPadding: PaddingValues) {
+fun BotttomNavGrpah(bbackstack: NavBackStack, firebaseAuthViewModel: FirebaseAuthViewModel,innerPadding: PaddingValues,geminiViewModel: GeminiViewModel) {
 
 
     NavDisplay(
@@ -58,7 +58,7 @@ fun BotttomNavGrpah(bbackstack: NavBackStack, firebaseAuthViewModel: FirebaseAut
         entryProvider = entryProvider {
 
             entry<BRoutes.HomeScreen> {
-                HomeScreen(bbackstack)
+                HomeScreen(bbackstack, geminiViewModel =geminiViewModel )
             }
 
 
