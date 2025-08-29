@@ -5,6 +5,12 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.READ_MEDIA_DOCUMENTS" />
+
+
+
     <application
         android:name=".mApplication"
         android:allowBackup="true"
@@ -28,6 +34,9 @@
         </activity>
 
         <activity android:name=".YtSummari"/>
+
+
+        <activity android:name=".PdfSumScreen"/>
     </application>
 
 

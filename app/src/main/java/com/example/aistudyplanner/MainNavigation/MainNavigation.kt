@@ -16,12 +16,13 @@ import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
 import com.example.aistudyplanner.FirebaseAuth.FirebaseAuthViewModel
+import com.example.aistudyplanner.Gemini.GeminiViewModel
 import com.example.aistudyplanner.OnBoarding.HorizontalPagerWithSmoothDots
 import com.example.aistudyplanner.Screeens.MainScreens
 import com.example.aistudyplanner.Screeens.SplashScreen
 
 @Composable
-fun MainNavigation(mainNavbackStack: NavBackStack,context: Context, firebaseAuthViewModel: FirebaseAuthViewModel, innerpadding: PaddingValues) {
+fun MainNavigation(mainNavbackStack: NavBackStack,context: Context, firebaseAuthViewModel: FirebaseAuthViewModel, innerpadding: PaddingValues,geminiViewModel: GeminiViewModel) {
 
 
     NavDisplay(
@@ -68,7 +69,8 @@ fun MainNavigation(mainNavbackStack: NavBackStack,context: Context, firebaseAuth
                 MainScreens(
                     firebaseAuthViewModel = firebaseAuthViewModel,
                     mainNavbackStack = mainNavbackStack,
-                    context
+                    context,
+                    geminiViewModel
                 )
             }
         }

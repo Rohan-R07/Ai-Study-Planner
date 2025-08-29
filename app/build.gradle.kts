@@ -103,4 +103,8 @@ dependencies {
     implementation(libs.json)
     implementation(libs.jsoup)
 
+    implementation(libs.tom.roush.pdfbox.android)
+
+
+
 }
