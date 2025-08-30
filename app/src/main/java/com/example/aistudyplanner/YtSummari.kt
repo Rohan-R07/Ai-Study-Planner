@@ -18,6 +18,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,12 +34,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -74,10 +77,12 @@ import com.example.aistudyplanner.Gemini.GeminiViewModel
 import com.example.aistudyplanner.ui.theme.AIStudyPlannerTheme
 import com.example.aistudyplanner.ui.theme.CDotFocusedColor
 import com.example.aistudyplanner.ui.theme.CDotUnFocusedColour
+import com.google.firebase.ai.type.content
 import kotlinx.coroutines.delay
 
 class YtSummari : ComponentActivity() {
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -97,8 +102,23 @@ class YtSummari : ComponentActivity() {
                 Scaffold(
                     modifier = Modifier
                         .fillMaxSize(),
-
-                    ) { innerPadding ->
+                    topBar = {
+                        CenterAlignedTopAppBar(
+                            navigationIcon = {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .clickable {
+                                            finish()
+                                        }
+                                        .padding(10.dp),
+                                )
+                            },
+                            title = {}
+                        )
+                    }
+                ) { innerPadding ->
 
 
                     var youtubeUrl by remember { mutableStateOf("") }
