@@ -12,6 +12,8 @@ import com.google.firebase.ai.ai
 import com.google.firebase.ai.type.GenerativeBackend
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
+import io.github.thoroldvix.api.Transcript
+import io.github.thoroldvix.api.TranscriptApiFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -87,23 +89,28 @@ class GeminiViewModel(
     val youtubeSummaryisLoading = MutableStateFlow<Boolean>(true)
 
     val youtubeSummaryError = MutableStateFlow<Boolean>(false)
+
     fun YTSummaries(url: String) {
         youtubeSummaryisLoading.value = true
+        youtubeSummaryError.value = false
 
         try {
 
             viewModelScope.launch {
-                val aiResponse =
-                    model.generateContent("Summarize this YouTube video in a clear and concise manner: [${url}]. Include the main points, key insights, and any actionable steps or tips provided in the video. Keep the summary under 200 words and structure it with bullet points for clarity")
+
+
+                val prompt =
+                    "Summarize this YouTube video in a clear and concise manner: [${url}]. Include the main points, key insights, and any actionable steps or tips provided in the video. Keep the summary under 200 words and structure it with bullet points for clarity"
+
+                val aiResponse = model.generateContent(prompt)
+
                 youtubeSummaryResponse.value = aiResponse.text.toString()
-//                Log.d("GoogleAIFromVIewmodl",)
 
                 if (aiResponse.text.toString().isNotEmpty()) {
                     youtubeSummaryisLoading.value = false
-//                    youtubeSummaryError.value = false
+
                 } else {
                     youtubeSummaryisLoading.value = true
-//                    youtubeSummaryError.value = true
                 }
             }
         } catch (e: Exception) {

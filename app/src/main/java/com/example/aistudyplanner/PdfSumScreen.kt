@@ -162,9 +162,7 @@ class PdfSumScreen : ComponentActivity() {
                                 IconButton(
                                     modifier = Modifier,
                                     onClick = {
-
-                                        finish() // This will close the current activity and go back to the previous one
-
+                                        finish()
                                     }
                                 ) {
                                     Icon(
@@ -197,7 +195,6 @@ class PdfSumScreen : ComponentActivity() {
 
                                 Card(
                                     modifier = Modifier
-//                                        .background(CBackground)
                                         .fillMaxWidth()
                                         .padding(bottom = 24.dp),
                                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
