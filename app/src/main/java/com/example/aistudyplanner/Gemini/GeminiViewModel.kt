@@ -113,14 +113,6 @@ class GeminiViewModel(
     }
 
 
-//    suspend fun extractPdfText(inputStream: InputStream): String = withContext(Dispatchers.IO) {
-//        val document = PdfDocument.load(inputStream)
-//        val stripper = PDFTextStripper()
-//        val text = stripper.getText(document)
-//        document.close()
-//        text
-//    }
-
     private val _selectedPdfUri = MutableStateFlow<Uri?>(null)
     val selectedPdfUri: StateFlow<Uri?> = _selectedPdfUri
 
@@ -134,9 +126,12 @@ class GeminiViewModel(
         _selectedPdfUri.value = uri
     }
 
+    val isLoadingPdfSummary = MutableStateFlow<Boolean>(false)
+
     private val isExtractionSucesfull = MutableStateFlow<Boolean>(false)
 
-    fun extractPdfText() {
+    fun extractAndSummarize() {
+        isLoadingPdfSummary.value = true
         viewModelScope.launch(Dispatchers.IO) {
             val uri = _selectedPdfUri.value ?: return@launch
             try {
@@ -154,7 +149,6 @@ class GeminiViewModel(
                         isExtractionSucesfull.value = false
                     }
 
-//                    Log.d("Extracted",isExtractionSucesfull.value.toString())
                 }
             } catch (e: Exception) {
                 _extractedText.value = "Failed to extract text: ${e.message}"
@@ -173,8 +167,10 @@ class GeminiViewModel(
 
                         val response = model.generateContent(prompt)
                         _summary.value = response.text.toString()
+                        isLoadingPdfSummary.value = false
                     } catch (e: Exception) {
                         _summary.value = "Failed to summarize: ${e.message}"
+                        isLoadingPdfSummary.value = true
                     }
                 }
             } else {
@@ -182,9 +178,6 @@ class GeminiViewModel(
             }
         }
     }
-
-
-
 }
 
 

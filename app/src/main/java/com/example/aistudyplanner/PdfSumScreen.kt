@@ -1,48 +1,94 @@
 package com.example.aistudyplanner
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.Icon
+import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
+import android.provider.ContactsContract
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Red
+import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalGraphicsContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.unpackFloat1
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.aistudyplanner.Gemini.GeminiViewModel
 import com.example.aistudyplanner.pdfExtaction.PdfFilePicker
 import com.example.aistudyplanner.ui.theme.AIStudyPlannerTheme
+import com.example.aistudyplanner.ui.theme.CBackground
+import com.example.aistudyplanner.ui.theme.CDotFocusedColor
+import com.example.aistudyplanner.ui.theme.CDotUnFocusedColour
+import com.google.firebase.ai.type.content
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class PdfSumScreen : ComponentActivity() {
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -58,14 +104,83 @@ class PdfSumScreen : ComponentActivity() {
                             return GeminiViewModel(applicationContext) as T
                         }
                     }
-                }
-            )
+                })
+
+            val isLoadingPdfSummary = geminiViewModel.value.isLoadingPdfSummary.collectAsState()
+            val context = LocalContext.current
+            val selectedPdfUriVM = geminiViewModel.value.selectedPdfUri.collectAsState()
+            val extractedText = geminiViewModel.value.extractedText.collectAsState().value
+            val summaryResonse = geminiViewModel.value.summary.collectAsState()
+
+
+            var selectedPdfUri by remember { mutableStateOf<Uri?>(null) }
+            var pdfName by remember { mutableStateOf("") }
+            var pdfPreviewBitmap by remember { mutableStateOf<Bitmap?>(null) }
+            var summary by remember { mutableStateOf("") }
+
+            var isLoading = geminiViewModel.value.isLoadingPdfSummary.collectAsState().value
+
+            var showCopySuccess by remember { mutableStateOf(false) }
+
+            val coroutineScope = rememberCoroutineScope()
+
+            val pdfPickerLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.OpenDocument(), onResult = { uri ->
+                    if (uri != null) {
+                        context.contentResolver.takePersistableUriPermission(
+                            uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        )
+
+                        geminiViewModel.value.setPdfUri(uri)
+                    }
+                    uri?.let {
+                        selectedPdfUri = it
+                        pdfName = getPdfFileName(context, it)
+
+                        coroutineScope.launch {
+                            pdfPreviewBitmap = generatePdfPreview(context, it)
+                        }
+                    }
+                })
+
 
             AIStudyPlannerTheme {
 
                 Scaffold(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxSize(),
+                    topBar = {
+                        CenterAlignedTopAppBar(
+                            title = {
+                                Text(
+                                    text = "Summarize PDF",
+                                    color = White,
+                                    fontSize = 20.sp
+                                )
+                            },
+                            navigationIcon = {
+                                IconButton(
+                                    modifier = Modifier,
+                                    onClick = {
+
+                                        finish() // This will close the current activity and go back to the previous one
+
+                                    }
+                                ) {
+                                    Icon(
+
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .padding(10.dp)
+                                    )
+                                }
+
+
+                            }
+                        )
+                    },
+                    contentColor = CBackground
                 ) { innerPadding ->
                     LazyColumn(
                         modifier = Modifier
@@ -73,62 +188,336 @@ class PdfSumScreen : ComponentActivity() {
                             .padding(innerPadding)
                     ) {
 
+
                         item {
+                            Column(
+                                modifier = Modifier
+                                    .background(CBackground)
+                            ) {
 
-                            val context = LocalContext.current
-                            val selectedPdfUri by geminiViewModel.value.selectedPdfUri.collectAsState()
-                            val extractedText by geminiViewModel.value.extractedText.collectAsState()
+                                Card(
+                                    modifier = Modifier
+//                                        .background(CBackground)
+                                        .fillMaxWidth()
+                                        .padding(bottom = 24.dp),
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = CBackground,
+                                    )
 
-                            val summary by geminiViewModel.value.summary.collectAsState()
+                                ) {
 
-                            val pdfPickerLauncher = rememberLauncherForActivityResult(
-                                contract = ActivityResultContracts.OpenDocument(),
-                                onResult = { uri ->
-                                    if (uri != null) {
-                                        context.contentResolver.takePersistableUriPermission(
-                                            uri,
-                                            Intent.FLAG_GRANT_READ_URI_PERMISSION
+
+                                    Column(
+                                        modifier = Modifier
+                                            .padding(20.dp)
+                                            .background(CBackground),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+
+
+                                        Icon(
+                                            imageVector = Icons.Default.Add,
+                                            contentDescription = "PDF Summarizer",
+                                            modifier = Modifier.size(48.dp),
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                        Spacer(modifier = Modifier.height(12.dp))
+                                        Text(
+                                            text = "PDF Summarizer",
+                                            style = MaterialTheme.typography.headlineMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                        Text(
+                                            text = "Select a PDF file to generate an AI summary",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            textAlign = TextAlign.Center
                                         )
 
-                                        geminiViewModel.value.setPdfUri(uri)
+                                        // PDf Selection Button
+                                        Button(
+                                            onClick = { pdfPickerLauncher.launch(arrayOf("application/pdf")) },
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(56.dp),
+                                            shape = RoundedCornerShape(12.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Add,
+                                                contentDescription = "Select PDF",
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(12.dp))
+                                            Text(
+                                                text = if (selectedPdfUri != null) "Change PDF" else "Select PDF File",
+                                                fontSize = 16.sp,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                        }
+
+                                        // PDF selected preview and info button
+
+                                        selectedPdfUri?.let { uri ->
+
+                                            Spacer(modifier = Modifier.height(24.dp))
+
+                                            Card(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                elevation = CardDefaults.cardElevation(
+                                                    defaultElevation = 2.dp
+                                                ),
+                                                colors = CardDefaults.cardColors(
+                                                    containerColor = CBackground
+                                                )
+                                            ) {
+                                                Column(
+                                                    modifier = Modifier.padding(16.dp)
+                                                ) {
+
+
+                                                    // PDF name
+
+                                                    Row(
+                                                        modifier = Modifier.fillMaxWidth(),
+                                                        verticalAlignment = Alignment.CenterVertically
+                                                    ) {
+                                                        Icon(
+                                                            imageVector = Icons.Default.Add,
+                                                            contentDescription = "PDF Icon",
+                                                            tint = Color(0xFFE53E3E),
+                                                            modifier = Modifier.size(24.dp)
+                                                        )
+                                                        Spacer(modifier = Modifier.width(12.dp))
+                                                        Column(modifier = Modifier.weight(1f)) {
+                                                            Text(
+                                                                text = "Selected PDF:",
+                                                                style = MaterialTheme.typography.bodySmall,
+                                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                            )
+                                                            Text(
+                                                                text = pdfName.ifEmpty { "Unknown PDF" },
+                                                                style = MaterialTheme.typography.bodyLarge,
+                                                                fontWeight = FontWeight.Medium,
+                                                                maxLines = 2,
+                                                                overflow = TextOverflow.Ellipsis
+                                                            )
+                                                        }
+                                                    }
+
+
+                                                    // PDF Preview
+
+                                                    pdfPreviewBitmap?.let { bitmap ->
+                                                        Spacer(modifier = Modifier.height(16.dp))
+                                                        Text(
+                                                            text = "Preview:",
+                                                            style = MaterialTheme.typography.bodySmall,
+                                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                        )
+                                                        Spacer(modifier = Modifier.height(8.dp))
+
+                                                        Box(
+                                                            modifier = Modifier
+                                                                .fillMaxWidth()
+                                                                .height(200.dp)
+                                                                .clip(RoundedCornerShape(8.dp))
+                                                                .background(Color.Gray.copy(alpha = 0.1f)),
+                                                            contentAlignment = Alignment.Center
+                                                        ) {
+                                                            Image(
+                                                                bitmap = bitmap.asImageBitmap(),
+                                                                contentDescription = "PDF Preview",
+                                                                modifier = Modifier
+                                                                    .fillMaxSize()
+                                                                    .clip(RoundedCornerShape(8.dp)),
+                                                                contentScale = ContentScale.Fit
+                                                            )
+                                                        }
+
+                                                        Spacer(modifier = Modifier.height(16.dp))
+
+                                                        Button(
+                                                            onClick = {
+                                                                geminiViewModel.value.extractAndSummarize()
+                                                            },
+                                                            modifier = Modifier.fillMaxWidth(),
+                                                            enabled = !isLoading,
+                                                            shape = RoundedCornerShape(8.dp)
+                                                        ) {
+                                                            if (isLoading) {
+                                                                CircularProgressIndicator(
+                                                                    modifier = Modifier
+//                                                                        .background(CDotFocusedColor)
+                                                                        .size(20.dp),
+                                                                    strokeWidth = 2.dp,
+                                                                    color = CDotFocusedColor
+                                                                )
+                                                                Spacer(modifier = Modifier.width(12.dp))
+                                                                Text("Generating Summary...")
+                                                            } else {
+                                                                Icon(
+                                                                    imageVector = Icons.Default.Add,
+                                                                    contentDescription = "Summarize",
+                                                                    modifier = Modifier.size(20.dp)
+                                                                )
+                                                                Spacer(modifier = Modifier.width(12.dp))
+                                                                Text("Generate Summary")
+                                                            }
+                                                        }
+
+
+                                                    }
+                                                }
+                                            }
+
+                                        }
+
+
                                     }
+
                                 }
-                            )
 
-
-                            Button(
-                                onClick = {
-                                    pdfPickerLauncher.launch(arrayOf("application/pdf"))
-                                }
-                            ) {
-                                Text("Select PDF")
-                            }
-
-
-                            selectedPdfUri?.let {
-                                Text("Selected: $it")
-                                Spacer(Modifier.height(8.dp))
-                                Button(onClick = { geminiViewModel.value.extractPdfText() }) {
-                                    Text("Extract Text")
-                                }
-                            }
-
-//                            extractedText?.let {
-//                                Text("Extracted: ${it}...")
-//                                Spacer(Modifier.height(8.dp))
-//                                Button(onClick = { geminiViewModel.value.() }) {
-//                                    Text("Summarize PDF")
-//                                }
-//                            }
-
-                            summary?.let {
-                                Text("Summary: $it")
                             }
                         }
+
+                        item {
+
+
+                            if (summaryResonse.value.toString()
+                                    .isNotEmpty() && summaryResonse.value.toString() != "null"
+                            ) {
+
+
+                                Spacer(modifier = Modifier.height(24.dp))
+
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(
+                                            alpha = 0.3f
+                                        )
+                                    )
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(16.dp)
+                                    ) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Add,
+                                                contentDescription = "Summary",
+                                                tint = MaterialTheme.colorScheme.primary,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(12.dp))
+                                            Text(
+                                                text = "AI Summary",
+                                                fontFamily = FontFamily(Font(R.font.space_grotesk)),
+                                                fontWeight = FontWeight.ExtraBold,
+                                                color = CDotFocusedColor
+                                            )
+
+
+                                            Spacer(Modifier.padding(horizontal = 70.dp))
+
+                                            Button(
+                                                modifier = Modifier,
+                                                onClick = {
+                                                    if (summaryResonse.value.toString()
+                                                            .isNotEmpty()
+                                                    ) {
+                                                        val clipboardManager =
+                                                            context.getSystemService(
+                                                                Context.CLIPBOARD_SERVICE
+                                                            ) as ClipboardManager
+                                                        val clip =
+                                                            ClipData.newPlainText(
+                                                                "Summary",
+                                                                summaryResonse.value.toString()
+                                                            )
+                                                        clipboardManager.setPrimaryClip(clip)
+                                                        showCopySuccess = true
+                                                    }
+                                                },
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = CDotUnFocusedColour.copy(0.4f)
+                                                )
+                                            ) {
+                                                Text(
+                                                    if (showCopySuccess) "Copied!" else "Copy",
+                                                    color = CDotFocusedColor
+                                                )
+                                            }
+
+                                            if (showCopySuccess) {
+                                                LaunchedEffect(showCopySuccess) {
+                                                    delay(2000)
+                                                    showCopySuccess = false
+                                                }
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.height(12.dp))
+
+                                        Text(
+                                            text = summaryResonse.value.toString(),
+                                            color = White,
+                                            fontFamily = FontFamily(Font(R.font.space_grotesk)),
+                                            lineHeight = 24.sp
+                                        )
+                                    }
+                                }
+
+                            }
+                        }
+
                     }
+
                 }
             }
         }
     }
+}
 
+
+private fun getPdfFileName(context: Context, uri: Uri): String {
+    return try {
+        context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+            val nameIndex = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+            cursor.moveToFirst()
+            cursor.getString(nameIndex) ?: "Unknown PDF"
+        } ?: "Unknown PDF"
+    } catch (e: Exception) {
+        "Unknown PDF"
+    }
+}
+
+
+// Helper function to generate PDF preview
+private suspend fun generatePdfPreview(context: Context, uri: Uri): Bitmap? {
+    return withContext(Dispatchers.IO) {
+        try {
+            context.contentResolver.openFileDescriptor(uri, "r")?.use { pfd ->
+                PdfRenderer(pfd).use { renderer ->
+                    if (renderer.pageCount > 0) {
+                        renderer.openPage(0).use { page ->
+                            val bitmap = Bitmap.createBitmap(
+                                page.width, page.height, Bitmap.Config.ARGB_8888
+                            )
+                            page.render(
+                                bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY
+                            )
+                            bitmap
+                        }
+                    } else null
+                }
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
 }
