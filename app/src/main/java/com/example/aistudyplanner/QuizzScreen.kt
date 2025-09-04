@@ -56,8 +56,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation3.runtime.rememberNavBackStack
 import com.example.aistudyplanner.Gemini.GeminiViewModel
 import com.example.aistudyplanner.Quizz.QuizzNavigation
+import com.example.aistudyplanner.Quizz.QuizzRoutes
 import com.example.aistudyplanner.Utils.generatePdfPreview
 import com.example.aistudyplanner.Utils.getPdfFileName
 import com.example.aistudyplanner.ui.theme.AIStudyPlannerTheme
@@ -82,11 +84,16 @@ class QuizzScreen : ComponentActivity() {
             }
         )
 
+
+
         enableEdgeToEdge()
         setContent {
             AIStudyPlannerTheme {
+                val navBackStack = rememberNavBackStack<QuizzRoutes>(QuizzRoutes.QmainScreen)
 
-                QuizzNavigation()
+                QuizzNavigation(
+                    navBackStack
+                )
 
             }
         }
