@@ -1,0 +1,191 @@
+package com.example.aistudyplanner.Quizz
+
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+@Composable
+fun QuizzMainScreen(
+    onUploadPdf: (Uri) -> Unit,
+    isGenerating: Boolean
+) {
+    val context = LocalContext.current
+    val pdfLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { onUploadPdf(it) }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // App Title
+        Text(
+            text = "AI Quiz Generator",
+            fontSize = 32.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Upload PDF to generate intelligent quizzes",
+            fontSize = 16.sp,
+            color = Color.White.copy(alpha = 0.8f),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(48.dp))
+
+        // Upload Button
+        AnimatedVisibility(
+            visible = !isGenerating,
+            enter = scaleIn() + fadeIn(),
+            exit = scaleOut() + fadeOut()
+        ) {
+            Card(
+                modifier = Modifier
+                    .size(200.dp)
+                    .clickable {
+                        pdfLauncher.launch("application/pdf")
+                    },
+                shape = CircleShape,
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White.copy(alpha = 0.9f)
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Upload PDF",
+                        modifier = Modifier.size(64.dp),
+                        tint = Color(0xFF667eea)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "Upload PDF",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFF667eea)
+                    )
+
+                    Text(
+                        text = "Tap to select",
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Features List
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White.copy(alpha = 0.1f)
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp)
+            ) {
+                Text(
+                    text = "Features",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                FeatureItem("📄", "PDF Analysis", "Extract content from any PDF document")
+                FeatureItem("🤖", "AI Generated", "Smart questions based on content")
+                FeatureItem("📊", "Multiple Choice", "Well-structured MCQ format")
+                FeatureItem("⚡", "Instant Results", "Get your quiz in seconds")
+            }
+        }
+    }
+}
+
+
+
+@Composable
+fun FeatureItem(
+    icon: String,
+    title: String,
+    description: String
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = icon,
+            fontSize = 24.sp,
+            modifier = Modifier.padding(end = 16.dp)
+        )
+
+        Column {
+            Text(
+                text = title,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.White
+            )
+            Text(
+                text = description,
+                fontSize = 14.sp,
+                color = Color.White.copy(alpha = 0.7f)
+            )
+        }
+    }
+}

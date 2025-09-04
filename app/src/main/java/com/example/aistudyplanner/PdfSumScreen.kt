@@ -73,6 +73,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.unpackFloat1
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.aistudyplanner.Gemini.GeminiViewModel
+import com.example.aistudyplanner.Utils.generatePdfPreview
+import com.example.aistudyplanner.Utils.getPdfFileName
 import com.example.aistudyplanner.pdfExtaction.PdfFilePicker
 import com.example.aistudyplanner.ui.theme.AIStudyPlannerTheme
 import com.example.aistudyplanner.ui.theme.CBackground
@@ -106,17 +108,14 @@ class PdfSumScreen : ComponentActivity() {
                     }
                 })
 
-            val isLoadingPdfSummary = geminiViewModel.value.isLoadingPdfSummary.collectAsState()
+
             val context = LocalContext.current
-            val selectedPdfUriVM = geminiViewModel.value.selectedPdfUri.collectAsState()
-            val extractedText = geminiViewModel.value.extractedText.collectAsState().value
             val summaryResonse = geminiViewModel.value.summary.collectAsState()
 
 
             var selectedPdfUri by remember { mutableStateOf<Uri?>(null) }
             var pdfName by remember { mutableStateOf("") }
             var pdfPreviewBitmap by remember { mutableStateOf<Bitmap?>(null) }
-            var summary by remember { mutableStateOf("") }
 
             var isLoading = geminiViewModel.value.isLoadingPdfSummary.collectAsState().value
 
@@ -481,40 +480,3 @@ class PdfSumScreen : ComponentActivity() {
 }
 
 
-private fun getPdfFileName(context: Context, uri: Uri): String {
-    return try {
-        context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-            val nameIndex = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
-            cursor.moveToFirst()
-            cursor.getString(nameIndex) ?: "Unknown PDF"
-        } ?: "Unknown PDF"
-    } catch (e: Exception) {
-        "Unknown PDF"
-    }
-}
-
-
-// Helper function to generate PDF preview
-private suspend fun generatePdfPreview(context: Context, uri: Uri): Bitmap? {
-    return withContext(Dispatchers.IO) {
-        try {
-            context.contentResolver.openFileDescriptor(uri, "r")?.use { pfd ->
-                PdfRenderer(pfd).use { renderer ->
-                    if (renderer.pageCount > 0) {
-                        renderer.openPage(0).use { page ->
-                            val bitmap = Bitmap.createBitmap(
-                                page.width, page.height, Bitmap.Config.ARGB_8888
-                            )
-                            page.render(
-                                bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY
-                            )
-                            bitmap
-                        }
-                    } else null
-                }
-            }
-        } catch (e: Exception) {
-            null
-        }
-    }
-}

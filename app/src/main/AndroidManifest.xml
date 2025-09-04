@@ -37,6 +37,9 @@
 
 
         <activity android:name=".PdfSumScreen"/>
+
+        <activity android:name=".QuizzScreen"/>
+
     </application>
 
 
