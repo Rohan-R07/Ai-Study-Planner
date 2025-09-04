@@ -1,25 +1,19 @@
 package com.example.aistudyplanner.Gemini
 
-import android.graphics.pdf.PdfDocument
 import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.aistudyplanner.Quizz.Question
 import com.google.firebase.Firebase
 import com.google.firebase.ai.ai
 import com.google.firebase.ai.type.GenerativeBackend
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
-import io.github.thoroldvix.api.Transcript
-import io.github.thoroldvix.api.TranscriptApiFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.InputStream
 
 class GeminiViewModel(
     val appContext: android.content.Context
@@ -120,6 +114,7 @@ class GeminiViewModel(
     }
 
 
+
     private val _selectedPdfUri = MutableStateFlow<Uri?>(null)
     val selectedPdfUri: StateFlow<Uri?> = _selectedPdfUri
 
@@ -181,6 +176,67 @@ class GeminiViewModel(
                     }
                 }
             } else {
+
+            }
+        }
+    }
+
+
+    val _quizzQuestions = MutableStateFlow<List<Question>>(emptyList())
+    val quizzQustion : StateFlow<List<Question>> = _quizzQuestions
+
+
+
+    private val _isLoadingQuizz = MutableStateFlow(false)
+    val isLoadingQuizz: StateFlow<Boolean> = _isLoadingQuizz
+
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
+
+    val generateQuizzUriPDf = MutableStateFlow<Uri?>(null)
+
+    val extractingFromPdfQuizSucessfull = MutableStateFlow<Boolean>(false)
+
+    val extractingTextFromPdfQuizz = MutableStateFlow<String>("")
+
+    val pdfSetingQuizz = MutableStateFlow<Uri?>(null)
+
+    fun setPDfquizz(uri: Uri) {
+        pdfSetingQuizz.value = uri
+    }
+
+    fun generateQuizz(){
+
+//        _selectedPdfUri.value = uri
+        extractingFromPdfQuizSucessfull.value = true
+        _isLoadingQuizz.value = true // becomes false just after quizz sucessfulll created
+
+        viewModelScope.launch(Dispatchers.IO) {
+
+            val uri = pdfSetingQuizz.value ?: return@launch
+
+            try {
+                appContext.contentResolver.openInputStream(uri)?.use { inputStream ->
+                    val pdfDoc = PDDocument.load(inputStream)
+                    val stripper = PDFTextStripper()
+                    val text = stripper.getText(pdfDoc)
+                    pdfDoc.close()
+                    extractingTextFromPdfQuizz.value = text
+                    extractingFromPdfQuizSucessfull.value = false
+
+                    Log.d("Extracted", text.toString())
+
+                    if (text.isNotEmpty()) {
+                        extractingFromPdfQuizSucessfull.value = false
+                    } else {
+                        extractingFromPdfQuizSucessfull.value = true
+                    }
+
+                }
+            } catch (e: Exception) {
+                extractingTextFromPdfQuizz.value = "Failed to extract text: ${e.message}"
+
+                extractingFromPdfQuizSucessfull.value = false
 
             }
         }

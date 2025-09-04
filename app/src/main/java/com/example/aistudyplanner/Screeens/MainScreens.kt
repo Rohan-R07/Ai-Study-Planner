@@ -30,6 +30,7 @@ import com.example.aistudyplanner.BottomNavigation.bottomNavBarItems
 import com.example.aistudyplanner.FirebaseAuth.FirebaseAuthViewModel
 import com.example.aistudyplanner.Gemini.GeminiViewModel
 import com.example.aistudyplanner.PdfSumScreen
+import com.example.aistudyplanner.QuizzScreen
 import com.example.aistudyplanner.R
 import com.example.aistudyplanner.Utils.ExpandableFloatingActionButton
 import com.example.aistudyplanner.Utils.FabAction
@@ -60,6 +61,9 @@ fun MainScreens(
     val pdfIntent = Intent(context, PdfSumScreen::class.java)
     pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
+    val quizzIntent = Intent(context, QuizzScreen::class.java)
+    quizzIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
 
     Scaffold(
         floatingActionButton = {
@@ -75,6 +79,8 @@ fun MainScreens(
 
                     },
                     FabAction(painterResource(R.drawable.quizz_icon), "Create an Ai Quizz") {
+
+                        context.startActivity(quizzIntent)
 
                     }
                 ),
