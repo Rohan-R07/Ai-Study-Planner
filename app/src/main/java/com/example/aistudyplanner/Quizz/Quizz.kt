@@ -10,8 +10,13 @@ data class Quiz(
 data class Question(
     val id: Int,
     val question: String,
-    val options: List<String>,
+    val options: List<String> = emptyList(),
     val correctAnswer: Int,
     val explanation: String? = null
 )
 
+data class QuizState(
+    val quiz: Quiz? = null,
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null
+)

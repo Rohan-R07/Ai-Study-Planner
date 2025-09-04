@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aistudyplanner.Quizz.Question
+import com.example.aistudyplanner.Quizz.Quiz
+import com.example.aistudyplanner.Quizz.QuizState
 import com.google.firebase.Firebase
 import com.google.firebase.ai.ai
 import com.google.firebase.ai.type.GenerativeBackend
@@ -14,6 +16,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
 
 class GeminiViewModel(
     val appContext: android.content.Context
@@ -114,7 +118,6 @@ class GeminiViewModel(
     }
 
 
-
     private val _selectedPdfUri = MutableStateFlow<Uri?>(null)
     val selectedPdfUri: StateFlow<Uri?> = _selectedPdfUri
 
@@ -183,8 +186,7 @@ class GeminiViewModel(
 
 
     val _quizzQuestions = MutableStateFlow<List<Question>>(emptyList())
-    val quizzQustion : StateFlow<List<Question>> = _quizzQuestions
-
+    val quizzQustion: StateFlow<List<Question>> = _quizzQuestions
 
 
     private val _isLoadingQuizz = MutableStateFlow(false)
@@ -201,11 +203,16 @@ class GeminiViewModel(
 
     val pdfSetingQuizz = MutableStateFlow<Uri?>(null)
 
+    private val _quizState = MutableStateFlow(QuizState())
+    val quizState: StateFlow<QuizState> = _quizState
     fun setPDfquizz(uri: Uri) {
         pdfSetingQuizz.value = uri
     }
 
-    fun generateQuizz(){
+    fun generateQuizz() {
+
+        _quizState.value = _quizState.value.copy(isLoading = true, errorMessage = null)
+
 
 //        _selectedPdfUri.value = uri
         extractingFromPdfQuizSucessfull.value = true
@@ -221,15 +228,67 @@ class GeminiViewModel(
                     val stripper = PDFTextStripper()
                     val text = stripper.getText(pdfDoc)
                     pdfDoc.close()
-                    extractingTextFromPdfQuizz.value = text
-                    extractingFromPdfQuizSucessfull.value = false
 
-                    Log.d("Extracted", text.toString())
+                    Log.d("ExtractingText", text.toString())
+
+
+
+
+
 
                     if (text.isNotEmpty()) {
+                        extractingTextFromPdfQuizz.value = text
                         extractingFromPdfQuizSucessfull.value = false
+
+
+                        val prompt = """
+                        Based on the following content, create a quiz with exactly 5 questions.
+                        Return the response strictly in JSON format like this:
+                        {
+                          "title": "Your Quiz Title",
+                          "questions": [
+                            {
+                              "id": 1,
+                              "question": "What is ...?",
+                              "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
+                              "correctAnswer": 2,
+                              "explanation": "Explanation for correct answer"
+                            }
+                          ]
+                        }
+                        Content:
+                        $extractedText
+                    """.trimIndent()
+
+
+                        try {
+                            val aiResponse = model.generateContent(prompt)
+                            val json = aiResponse.text ?: ""
+
+                            val quiz = parseQuizJson(json)
+
+                            withContext(Dispatchers.Main) {
+                                _quizState.value = QuizState(
+                                    quiz = quiz,
+                                    isLoading = false
+                                )
+                            }
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                _quizState.value = QuizState(
+                                    errorMessage = "Failed to generate quiz: ${e.message}",
+                                    isLoading = false
+                                )
+                            }
+                        }
+
                     } else {
-                        extractingFromPdfQuizSucessfull.value = true
+                        withContext(Dispatchers.Main) {
+                            _quizState.value = QuizState(
+                                errorMessage = "No text found in PDF.",
+                                isLoading = false
+                            )
+                        }
                     }
 
                 }
@@ -238,9 +297,57 @@ class GeminiViewModel(
 
                 extractingFromPdfQuizSucessfull.value = false
 
+
+                withContext(Dispatchers.Main) {
+                    _quizState.value = QuizState(
+                        errorMessage = "Failed to extract text: ${e.message}",
+                        isLoading = false
+                    )
+                }
+
             }
         }
     }
-}
 
+
+    private fun parseQuizJson(json: String): Quiz? {
+        return try {
+            val jsonObj = JSONObject(json)
+            val title = jsonObj.optString("title", "Generated Quiz")
+            val questionsArray = jsonObj.getJSONArray("questions")
+
+            val questionsList = mutableListOf<Question>()
+            for (i in 0 until questionsArray.length()) {
+                val qObj = questionsArray.getJSONObject(i)
+                val id = qObj.getInt("id")
+                val question = qObj.getString("question")
+                val optionsArray = qObj.getJSONArray("options")
+                val options = List(optionsArray.length()) { idx -> optionsArray.getString(idx) }
+                val correctAnswer = qObj.getInt("correctAnswer")
+                val explanation = qObj.optString("explanation", null)
+
+                questionsList.add(
+                    Question(
+                        id = id,
+                        question = question,
+                        options = options,
+                        correctAnswer = correctAnswer,
+                        explanation = explanation
+                    )
+                )
+            }
+
+            Quiz(title = title, questions = questionsList)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+
+    fun checkAnswer(questionId: Int, selectedOption: Int) {
+        // You can log, save, or analyze user's answer here
+        Log.d("Quiz", "Question $questionId selected option: $selectedOption")
+    }
+
+}
 

@@ -1,6 +1,7 @@
 package com.example.aistudyplanner.Quizz
 
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -25,136 +26,191 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalGraphicsContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation3.runtime.NavBackStack
+import com.example.aistudyplanner.BottomNavigation.BottomNavBarItems
+import com.example.aistudyplanner.Gemini.GeminiViewModel
 
 @Composable
 fun QuizzMainScreen(
     onUploadPdf: (Uri) -> Unit,
-    isGenerating: Boolean
+    isGenerating: Boolean,
+    navBackState: NavBackStack
 ) {
     val context = LocalContext.current
+    val isPDFSelected = remember { mutableStateOf<Boolean?>(null) }
     val pdfLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let { onUploadPdf(it) }
+        val se =uri != null
+        Log.d("SucessfullPdf",se.toString())
+
+        if (uri != null) {
+            isPDFSelected.value = true
+        } else {
+            isPDFSelected.value = false
+        }
     }
 
-    Column(
+    val nextScreen = remember { mutableStateOf(false) }
+
+    Scaffold(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        // App Title
-        Text(
-            text = "AI Quiz Generator",
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            textAlign = TextAlign.Center
-        )
+            .fillMaxSize(),
 
-        Spacer(modifier = Modifier.height(8.dp))
+        ) { innerPadding ->
 
-        Text(
-            text = "Upload PDF to generate intelligent quizzes",
-            fontSize = 16.sp,
-            color = Color.White.copy(alpha = 0.8f),
-            textAlign = TextAlign.Center
-        )
 
-        Spacer(modifier = Modifier.height(48.dp))
-
-        // Upload Button
-        AnimatedVisibility(
-            visible = !isGenerating,
-            enter = scaleIn() + fadeIn(),
-            exit = scaleOut() + fadeOut()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
+
+
+            // App Title
+            Text(
+                text = "AI Quiz Generator",
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Upload PDF to generate intelligent quizzes",
+                fontSize = 16.sp,
+                color = Color.White.copy(alpha = 0.8f),
+                textAlign = TextAlign.Center
+            )
+
+            val context = LocalContext.current
+
+            val geminiViewModel = viewModel<GeminiViewModel>(
+                factory =
+                    object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            return GeminiViewModel(context) as T
+                        }
+                    }
+
+            )
+            Spacer(modifier = Modifier.height(48.dp))
+
+            // Upload Button
+            AnimatedVisibility(
+                visible = !isGenerating,
+                enter = scaleIn() + fadeIn(),
+                exit = scaleOut() + fadeOut()
+            ) {
+                Card(
+                    modifier = Modifier
+                        .size(200.dp)
+                        .clickable {
+                            pdfLauncher.launch("application/pdf")
+                        },
+                    shape = CircleShape,
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.White.copy(alpha = 0.9f)
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+                ) {
+
+                    Log.d("SucessfullPdf",isPDFSelected.value.toString())
+
+                    if (isPDFSelected.value == true) {
+                        navBackState.add(QuizzRoutes.QProcessingScreen)
+                        Log.d("SucessfullPdf", "working bro")
+                    } else if (isPDFSelected.value == false) {
+                        Log.d("SucessfullPdf", "Not working at al borther")
+                    }
+
+
+
+
+
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Upload PDF",
+                            modifier = Modifier.size(64.dp),
+                            tint = Color(0xFF667eea)
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Text(
+                            text = "Upload PDF",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFF667eea)
+                        )
+
+                        Text(
+                            text = "Tap to select",
+                            fontSize = 14.sp,
+                            color = Color.Gray
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Features List
             Card(
-                modifier = Modifier
-                    .size(200.dp)
-                    .clickable {
-                        pdfLauncher.launch("application/pdf")
-                    },
-                shape = CircleShape,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.9f)
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+                    containerColor = Color.White.copy(alpha = 0.1f)
+                )
             ) {
                 Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    modifier = Modifier.padding(24.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Upload PDF",
-                        modifier = Modifier.size(64.dp),
-                        tint = Color(0xFF667eea)
+                    Text(
+                        text = "Features",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    Text(
-                        text = "Upload PDF",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF667eea)
-                    )
-
-                    Text(
-                        text = "Tap to select",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
+                    FeatureItem("📄", "PDF Analysis", "Extract content from any PDF document")
+                    FeatureItem("🤖", "AI Generated", "Smart questions based on content")
+                    FeatureItem("📊", "Multiple Choice", "Well-structured MCQ format")
+                    FeatureItem("⚡", "Instant Results", "Get your quiz in seconds")
                 }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Features List
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White.copy(alpha = 0.1f)
-            )
-        ) {
-            Column(
-                modifier = Modifier.padding(24.dp)
-            ) {
-                Text(
-                    text = "Features",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                FeatureItem("📄", "PDF Analysis", "Extract content from any PDF document")
-                FeatureItem("🤖", "AI Generated", "Smart questions based on content")
-                FeatureItem("📊", "Multiple Choice", "Well-structured MCQ format")
-                FeatureItem("⚡", "Instant Results", "Get your quiz in seconds")
             }
         }
     }
 }
-
-
 
 @Composable
 fun FeatureItem(
