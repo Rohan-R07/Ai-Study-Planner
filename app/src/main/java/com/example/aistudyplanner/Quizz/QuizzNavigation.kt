@@ -57,6 +57,24 @@ fun QuizzNavigation(backStack: NavBackStack) {
         },
         modifier = Modifier
             .fillMaxSize(),
+//        entryDecorators = listOf(
+//            // Add the default decorators for managing scenes and saving state
+//            rememberSceneSetupNavEntryDecorator(),
+//            rememberSavedStateNavEntryDecorator(),
+//            // Then add the view model store decorator
+//            rememberViewModelStoreNavEntryDecorator(),
+//        ),
+//
+//        popTransitionSpec = {
+//            // Slide in from left when navigating back
+//            slideInHorizontally(initialOffsetX = { -it }) togetherWith
+//                    slideOutHorizontally(targetOffsetX = { it })
+//        },
+//        predictivePopTransitionSpec = {
+//            // Slide in from left when navigating back
+//            slideInHorizontally(initialOffsetX = { -it }) togetherWith
+//                    slideOutHorizontally(targetOffsetX = { it })
+//        },
         entryProvider = entryProvider {
 
             entry<QuizzRoutes.QmainScreen> {
@@ -82,10 +100,8 @@ fun QuizzNavigation(backStack: NavBackStack) {
                         currentScreen = QuizzRoutes.QuizzPannel
                         isGeneratingQuiz = false
                     },
-                    onBack = {
-                        currentScreen = QuizzRoutes.QmainScreen
-                        selectedPdfUri = null
-                    }
+                    backStack
+
                 )
             }
 
