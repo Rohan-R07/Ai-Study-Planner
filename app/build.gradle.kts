@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
     implementation(libs.lifecycle.viewmodel.navigation3)
+    implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -104,6 +105,8 @@ dependencies {
     implementation(libs.jsoup)
 
     implementation(libs.tom.roush.pdfbox.android)
+
+    implementation(libs.androidx.material3.v140alpha14)
 
 
 }

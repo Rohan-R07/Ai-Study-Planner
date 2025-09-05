@@ -209,6 +209,8 @@ class GeminiViewModel(
         pdfSetingQuizz.value = uri
     }
 
+    val creatingQuizzs = MutableStateFlow<Boolean>(false)
+
     fun generateQuizz() {
 
         _quizState.value = _quizState.value.copy(isLoading = true, errorMessage = null)
@@ -218,7 +220,11 @@ class GeminiViewModel(
         extractingFromPdfQuizSucessfull.value = true
         _isLoadingQuizz.value = true // becomes false just after quizz sucessfulll created
 
+        creatingQuizzs.value = false
+
+
         viewModelScope.launch(Dispatchers.IO) {
+            creatingQuizzs.value = false
 
             val uri = pdfSetingQuizz.value ?: return@launch
 
@@ -228,6 +234,7 @@ class GeminiViewModel(
                     val stripper = PDFTextStripper()
                     val text = stripper.getText(pdfDoc)
                     pdfDoc.close()
+                    creatingQuizzs.value = false
 
                     Log.d("ExtractingText", text.toString())
 
@@ -238,12 +245,16 @@ class GeminiViewModel(
 
                     if (text.isNotEmpty()) {
                         extractingTextFromPdfQuizz.value = text
-                        extractingFromPdfQuizSucessfull.value = false
+                        extractingFromPdfQuizSucessfull.value = true
+                        creatingQuizzs.value = false
 
 
                         val prompt = """
-                        Based on the following content, create a quiz with exactly 5 questions.
-                        Return the response strictly in JSON format like this:
+                            
+                            this is the thing which i need you to make quizz of 
+                            
+                            ${text.toString()}
+
                         {
                           "title": "Your Quiz Title",
                           "questions": [
@@ -265,6 +276,14 @@ class GeminiViewModel(
                             val aiResponse = model.generateContent(prompt)
                             val json = aiResponse.text ?: ""
 
+//                            Log.d("Quizzinghere brother",aiResponse.text.toString()   )
+
+
+                            if (aiResponse.text?.isNotEmpty()!!) {
+                                creatingQuizzs.value = true
+                            } else
+                                creatingQuizzs.value = false
+
                             val quiz = parseQuizJson(json)
 
                             withContext(Dispatchers.Main) {
@@ -273,13 +292,20 @@ class GeminiViewModel(
                                     isLoading = false
                                 )
                             }
+
                         } catch (e: Exception) {
                             withContext(Dispatchers.Main) {
                                 _quizState.value = QuizState(
                                     errorMessage = "Failed to generate quiz: ${e.message}",
                                     isLoading = false
                                 )
+
+                                creatingQuizzs.value = false
+
                             }
+
+                            creatingQuizzs.value = false
+
                         }
 
                     } else {
@@ -297,6 +323,7 @@ class GeminiViewModel(
 
                 extractingFromPdfQuizSucessfull.value = false
 
+                creatingQuizzs.value = false
 
                 withContext(Dispatchers.Main) {
                     _quizState.value = QuizState(

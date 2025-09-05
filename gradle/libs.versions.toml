@@ -38,6 +38,7 @@ okhttp = "4.12.0"
 pdfboxAndroid = "2.0.27.0"
 pdfboxAndroidVersion = "2.0.27.0"
 pdfRenderer = "1.0.0-alpha01"
+material = "1.13.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -87,6 +88,7 @@ lifecycle-viewmodel-navigation3 = { group = "androidx.lifecycle", name = "lifecy
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 pdfbox-android = { module = "org.apache.pdfbox:pdfbox-android", version.ref = "pdfboxAndroid" }
 tom-roush-pdfbox-android = { module = "com.tom-roush:pdfbox-android", version.ref = "pdfboxAndroidVersion" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -80,6 +80,7 @@ fun QuizzMainScreen(
 
         Column(
             modifier = Modifier
+                .padding(innerPadding)
                 .fillMaxSize()
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
