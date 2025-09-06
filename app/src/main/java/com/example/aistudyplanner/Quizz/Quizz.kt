@@ -20,3 +20,5 @@ data class QuizState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 )
+
+

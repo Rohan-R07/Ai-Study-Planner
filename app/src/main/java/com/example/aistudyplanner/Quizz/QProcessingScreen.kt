@@ -52,7 +52,29 @@ import com.example.aistudyplanner.Gemini.GeminiViewModel
 import com.example.aistudyplanner.ui.theme.CDotFocusedColor
 import kotlinx.coroutines.delay
 
-
+val json =
+    """
+    [
+        {
+            "id": 1,
+            "name": "John Doe",
+            "title": "Software Engineer",
+            "age": 28
+        },
+        {
+            "id": 2,
+            "name": "Jane Smith",
+            "title": "Product Manager",
+            "age": 32
+        },
+        {
+            "id": 3,
+            "name": "Alex Johnson",
+            "title": "UI/UX Designer",
+            "age": 26
+        }
+    ]
+    """
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ProcessingScreen(
@@ -94,17 +116,18 @@ fun ProcessingScreen(
 
         if (extractedTextFromPdfSucessfull){
             navBackStack.add(QuizzRoutes.QuizzPannel)
-            navBackStack.remove(QuizzRoutes.QProcessingScreen)
+//            navBackStack.remove(QuizzRoutes.QProcessingScreen)
         }
         LaunchedEffect(pdfUri) {
             if (pdfUri != null) {
 
 
-                geminiViewModel.generateQuizz()
+//                geminiViewModel.generateQuizz()
 
-//                if (extractedTextFromPdfSucessfull) {
-//                    Log.d("RohanRPipe", "Extracting sucesful Rohan ")
-//                }
+
+//                geminiViewModel.parsePeopleJson(json)
+
+
                 // Simulate processing steps
                 for (i in processingSteps.indices) {
                     processingStep = i
