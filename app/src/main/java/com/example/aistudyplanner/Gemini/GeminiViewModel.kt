@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
 import org.json.JSONObject
 
 class GeminiViewModel(
@@ -337,8 +338,48 @@ class GeminiViewModel(
     }
 
 
-    private fun parseQuizJson(json: String): Quiz? {
+//    private fun parseQuizJson(json: String): Quiz? {
+//        return try {
+//            val jsonObj = JSONObject(json)
+//            val title = jsonObj.optString("title", "Generated Quiz")
+//            val questionsArray = jsonObj.getJSONArray("questions")
+//
+//            val questionsList = mutableListOf<Question>()
+//            for (i in 0 until questionsArray.length()) {
+//                val qObj = questionsArray.getJSONObject(i)
+//                val id = qObj.getInt("id")
+//                val question = qObj.getString("question")
+//                val optionsArray = qObj.getJSONArray("options")
+//                val options = List(optionsArray.length()) { idx -> optionsArray.getString(idx) }
+//                val correctAnswer = qObj.getInt("correctAnswer")
+//                val explanation = qObj.optString("explanation", null)
+//
+//                questionsList.add(
+//                    Question(
+//                        id = id,
+//                        question = question,
+//                        options = options,
+//                        correctAnswer = correctAnswer,
+//                        explanation = explanation
+//                    )
+//                )
+//            }
+//
+//            Quiz(title = title, questions = questionsList)
+//        } catch (e: Exception) {
+//            null
+//        }
+//    }
+
+
+    private fun parseQuizJson(rawResponse: String): Quiz? {
         return try {
+            // Step 1: Extract only the JSON part (remove ```json and ``` etc.)
+            val json = rawResponse
+                .substringAfter("{")    // Take from the first '{'
+                .substringBeforeLast("}") + "}" // Take until the last '}'
+
+            // Step 2: Parse the clean JSON
             val jsonObj = JSONObject(json)
             val title = jsonObj.optString("title", "Generated Quiz")
             val questionsArray = jsonObj.getJSONArray("questions")
@@ -346,12 +387,17 @@ class GeminiViewModel(
             val questionsList = mutableListOf<Question>()
             for (i in 0 until questionsArray.length()) {
                 val qObj = questionsArray.getJSONObject(i)
-                val id = qObj.getInt("id")
-                val question = qObj.getString("question")
-                val optionsArray = qObj.getJSONArray("options")
-                val options = List(optionsArray.length()) { idx -> optionsArray.getString(idx) }
-                val correctAnswer = qObj.getInt("correctAnswer")
-                val explanation = qObj.optString("explanation", null)
+                val id = qObj.optInt("id", i + 1) // fallback to index
+                val question = qObj.optString("question", "No question provided")
+                val optionsArray = qObj.optJSONArray("options") ?: JSONArray()
+                val options = List(optionsArray.length()) { idx ->
+                    optionsArray.optString(
+                        idx,
+                        "Option ${idx + 1}"
+                    )
+                }
+                val correctAnswer = qObj.optInt("correctAnswer", 0)
+                val explanation = qObj.optString("explanation", "No explanation provided")
 
                 questionsList.add(
                     Question(
@@ -366,15 +412,93 @@ class GeminiViewModel(
 
             Quiz(title = title, questions = questionsList)
         } catch (e: Exception) {
+            e.printStackTrace()
             null
+        }
+
+    }
+//
+//    private val _quizzState = MutableStateFlow<Quiz?>(null)
+//    val quizzStatem: StateFlow<Quiz?> = _quizzState
+//
+//    fun setQuizzFromResponse(response: String) {
+//        _quizzState.value = parseQuizJson(response)
+//    }
+//    fun checkAnswer(questionId: Int, selectedOption: Int) {
+//        // You can log, save, or analyze user's answer here
+//        Log.d("Quiz", "Question $questionId selected option: $selectedOption")
+//    }
+
+    private val _peopleList = MutableStateFlow<List<Person>>(emptyList())
+    val peopleList: StateFlow<List<Person>> = _peopleList
+
+    private val _errorQuizz = MutableStateFlow<String?>(null)
+    val errorQizz: StateFlow<String?> = _errorQuizz
+
+    fun loadPeopleFromJson(rawJson: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val cleaned = sanitizeJson(rawJson)
+                val people = mutableListOf<Person>()
+
+                if (cleaned.trimStart().startsWith("[")) {
+                    parseArrayToPeople(JSONArray(cleaned), people)
+                } else if (cleaned.trimStart().startsWith("{")) {
+                    val obj = JSONObject(cleaned)
+                    val arr = when {
+                        obj.has("people") && obj.opt("people") is JSONArray -> obj.getJSONArray("people")
+                        obj.has("data") && obj.opt("data") is JSONArray -> obj.getJSONArray("data")
+                        else -> JSONArray().put(obj)
+                    }
+                    parseArrayToPeople(arr, people)
+                }
+
+                _peopleList.value = people
+                _errorQuizz.value = null
+            } catch (t: Throwable) {
+                _peopleList.value = emptyList()
+                _errorQuizz.value = "Parsing error: ${t.message}"
+            }
         }
     }
 
+    private fun parseArrayToPeople(arr: JSONArray, outList: MutableList<Person>) {
+        for (i in 0 until arr.length()) {
+            try {
+                val obj = arr.optJSONObject(i) ?: JSONObject(arr.get(i).toString())
+                val id = obj.optInt("id", -1)
+                val name = obj.optString("name", "Unknown")
+                val text = obj.optString("text", "")
+                val age = obj.optInt("age", 0)
 
-    fun checkAnswer(questionId: Int, selectedOption: Int) {
-        // You can log, save, or analyze user's answer here
-        Log.d("Quiz", "Question $questionId selected option: $selectedOption")
+                outList.add(Person(id = id, name = name, text = text, age = age))
+            } catch (e: Exception) {
+                Log.w("PeopleViewModel", "Skipping element $i due to parse error: ${e.message}")
+            }
+        }
     }
+
+    private fun sanitizeJson(raw: String): String {
+        var s = raw.trim()
+        s = s.replace("```json", "", ignoreCase = true)
+            .replace("```", "")
+            .trim()
+
+        val first = s.indexOfFirst { it == '{' || it == '[' }
+        val last = s.indexOfLast { it == '}' || it == ']' }
+
+        return if (first >= 0 && last >= 0 && last >= first) {
+            s.substring(first, last + 1).trim()
+        } else s
+    }
+
 
 }
 
+
+class Person(
+    val id: Int,
+    val name: String,
+    val text: String,
+    val age: Int
+)
