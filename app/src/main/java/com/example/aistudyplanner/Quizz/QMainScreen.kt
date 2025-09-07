@@ -27,12 +27,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -53,7 +51,9 @@ import com.example.aistudyplanner.Gemini.GeminiViewModel
 
 @Composable
 fun QuizzMainScreen(
-    onUploadPdf: (Uri) -> Unit, isGenerating: Boolean, navBackState: NavBackStack
+    onUploadPdf: (Uri) -> Unit,
+    isGenerating: Boolean,
+    navBackState: NavBackStack
 ) {
     val context = LocalContext.current
     val isPDFSelected = remember { mutableStateOf<Boolean?>(null) }
@@ -74,7 +74,8 @@ fun QuizzMainScreen(
     val nextScreen = remember { mutableStateOf(false) }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize(),
 
         ) { innerPadding ->
 
@@ -111,28 +112,34 @@ fun QuizzMainScreen(
 
             val context = LocalContext.current
 
-            val geminiViewModel =
-                viewModel<GeminiViewModel>(factory = object : ViewModelProvider.Factory {
-                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                        return GeminiViewModel(context) as T
+            val geminiViewModel = viewModel<GeminiViewModel>(
+                factory =
+                    object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            return GeminiViewModel(context) as T
+                        }
                     }
-                }
 
-                )
+            )
             Spacer(modifier = Modifier.height(48.dp))
 
             // Upload Button
             AnimatedVisibility(
-                visible = !isGenerating, enter = scaleIn() + fadeIn(), exit = scaleOut() + fadeOut()
+                visible = !isGenerating,
+                enter = scaleIn() + fadeIn(),
+                exit = scaleOut() + fadeOut()
             ) {
                 Card(
                     modifier = Modifier
                         .size(200.dp)
                         .clickable {
                             pdfLauncher.launch("application/pdf")
-                        }, shape = CircleShape, colors = CardDefaults.cardColors(
+                        },
+                    shape = CircleShape,
+                    colors = CardDefaults.cardColors(
                         containerColor = Color.White.copy(alpha = 0.9f)
-                    ), elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
                 ) {
 
                     Log.d("SucessfullPdf", isPDFSelected.value.toString())
@@ -170,83 +177,20 @@ fun QuizzMainScreen(
                         )
 
                         Text(
-                            text = "Tap to select", fontSize = 14.sp, color = Color.Gray
+                            text = "Tap to select",
+                            fontSize = 14.sp,
+                            color = Color.Gray
                         )
                     }
                 }
             }
 
 
-            val examplebutton = remember { mutableStateOf(false) }
-
-            val json = """
-    [
-        {
-            "id": 1,
-            "name": "John Doe",
-            "title": "Software Engineer",
-            "age": 28
-        },
-        {
-            "id": 2,
-            "name": "Jane Smith",
-            "title": "Product Manager",
-            "age": 32
-        },
-        {
-            "id": 3,
-            "name": "Alex Johnson",
-            "title": "UI/UX Designer",
-            "age": 26
-        }
-    ]
-    """
-
-            Button(onClick = {
-                examplebutton.value = true
-
-            }) {
-                Text("Example")
-            }
-            if (examplebutton.value) {
-                examplebutton.value = false
-                geminiViewModel.loadPeopleFromJson(json)
-
-            } else {
-                examplebutton.value = false
-            }
 
 
             Spacer(modifier = Modifier.height(32.dp))
 
             // Features List
-//            Card(
-//                modifier = Modifier.fillMaxWidth(),
-//                shape = RoundedCornerShape(16.dp),
-//                colors = CardDefaults.cardColors(
-//                    containerColor = Color.White.copy(alpha = 0.1f)
-//                )
-//            ) {
-//                Column(
-//                    modifier = Modifier.padding(24.dp)
-//                ) {
-//                    Text(
-//                        text = "Features",
-//                        fontSize = 20.sp,
-//                        fontWeight = FontWeight.Bold,
-//                        color = Color.White
-//                    )
-//
-//                    Spacer(modifier = Modifier.height(16.dp))
-//
-//                    FeatureItem("📄", "PDF Analysis", "Extract content from any PDF document")
-//                    FeatureItem("🤖", "AI Generated", "Smart questions based on content")
-//                    FeatureItem("📊", "Multiple Choice", "Well-structured MCQ format")
-//                    FeatureItem("⚡", "Instant Results", "Get your quiz in seconds")
-//                }
-//            }
-
-            val peopleLIst = geminiViewModel.peopleList.collectAsState()
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
@@ -266,33 +210,26 @@ fun QuizzMainScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    val people by geminiViewModel.peopleList.collectAsState()
-                    val error by geminiViewModel.errorQizz.collectAsState()
-
-                    if (error != null) {
-
-                        Text("Error: $error", color = MaterialTheme.colorScheme.error)
-                    } else {
-
-                        people.forEach { person ->
-                            Text("ID: ${person.id}")
-                            Text("Name: ${person.name}")
-                            Text("Text: ${person.text}")
-                            Text("Age: ${person.age}")
-                            Spacer(modifier = Modifier.height(12.dp))
-                        }
-                    }
-
-
+                    FeatureItem("📄", "PDF Analysis", "Extract content from any PDF document")
+                    FeatureItem("🤖", "AI Generated", "Smart questions based on content")
+                    FeatureItem("📊", "Multiple Choice", "Well-structured MCQ format")
+                    FeatureItem("⚡", "Instant Results", "Get your quiz in seconds")
                 }
             }
+
+
+
+
+
         }
     }
 }
 
 @Composable
 fun FeatureItem(
-    icon: String, title: String, description: String
+    icon: String,
+    title: String,
+    description: String
 ) {
     Row(
         modifier = Modifier
@@ -301,7 +238,9 @@ fun FeatureItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = icon, fontSize = 24.sp, modifier = Modifier.padding(end = 16.dp)
+            text = icon,
+            fontSize = 24.sp,
+            modifier = Modifier.padding(end = 16.dp)
         )
 
         Column {
@@ -312,7 +251,9 @@ fun FeatureItem(
                 color = Color.White
             )
             Text(
-                text = description, fontSize = 14.sp, color = Color.White.copy(alpha = 0.7f)
+                text = description,
+                fontSize = 14.sp,
+                color = Color.White.copy(alpha = 0.7f)
             )
         }
     }
