@@ -39,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Unspecified
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalGraphicsContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -75,6 +76,7 @@ val json =
         }
     ]
     """
+
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ProcessingScreen(
@@ -112,20 +114,22 @@ fun ProcessingScreen(
         val extractedTextFromPdfSucessfull =
             geminiViewModel.creatingQuizzs.collectAsState().value
 //
-        Log.d("ExtractedTexting",extractedTextFromPdfSucessfull.toString())
+        Log.d("ExtractedTexting", extractedTextFromPdfSucessfull.toString())
 
-        if (extractedTextFromPdfSucessfull){
+        val quizz = geminiViewModel.quizState.collectAsState()
+        if (quizz.value?.title.toString() != "null") {
             navBackStack.add(QuizzRoutes.QuizzPannel)
-//            navBackStack.remove(QuizzRoutes.QProcessingScreen)
+            navBackStack.remove(QuizzRoutes.QProcessingScreen)
+            Log.d("ExtractedTexting", extractedTextFromPdfSucessfull.toString())
+
         }
+
+        Log.d("Title",quizz.value?.title.toString())
+
         LaunchedEffect(pdfUri) {
             if (pdfUri != null) {
 
-
-//                geminiViewModel.generateQuizz()
-
-
-//                geminiViewModel.parsePeopleJson(json)
+                geminiViewModel.generateQuizz()
 
 
                 // Simulate processing steps
@@ -133,8 +137,12 @@ fun ProcessingScreen(
                     processingStep = i
                     delay(1000) // Simulate processing time
                 }
-                // Generate sample quiz (replace with actual AI generation)
             }
+
+
+            Log.d("ExtractedTexting", extractedTextFromPdfSucessfull.toString())
+
+
         }
 
         Column(
@@ -173,7 +181,7 @@ fun ProcessingScreen(
                             ),
                             modifier = Modifier
                                 .size(100.dp)
-                            )
+                        )
 
 //                        Icon(
 //                            imageVector = Icons.Default.Add,
@@ -240,7 +248,6 @@ fun ProcessingScreen(
 
             TextButton(
                 onClick = {
-                    // TODO backing
                     navBackStack.remove(QuizzRoutes.QProcessingScreen)
                 },
                 colors = ButtonDefaults.textButtonColors(
