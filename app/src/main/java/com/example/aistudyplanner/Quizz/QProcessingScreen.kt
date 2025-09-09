@@ -138,11 +138,7 @@ fun ProcessingScreen(
                     delay(1000) // Simulate processing time
                 }
             }
-
-
             Log.d("ExtractedTexting", extractedTextFromPdfSucessfull.toString())
-
-
         }
 
         Column(
