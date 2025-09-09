@@ -259,7 +259,7 @@ class GeminiViewModel(
                             {
                               "id": 1,
                               "question": "What is ...?",
-                              "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
+                              "options": ["Option 1", "Option 2", "Option 3", "Option 4", "Option5"],
                               "correctAnswer": 2,
                               "explanation": "Explanation for correct answer"
                             }
