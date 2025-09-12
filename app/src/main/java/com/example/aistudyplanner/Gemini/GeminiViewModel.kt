@@ -1,7 +1,9 @@
 package com.example.aistudyplanner.Gemini
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.util.Log
+import androidx.compose.ui.platform.LocalGraphicsContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aistudyplanner.Quizz.Question
@@ -212,6 +214,7 @@ class GeminiViewModel(
 
     val creatingQuizzs = MutableStateFlow<Boolean>(false)
 
+    @SuppressLint("SuspiciousIndentation")
     fun generateQuizz() {
 
 
@@ -258,7 +261,7 @@ class GeminiViewModel(
                           "questions": [
                             {
                               "id": 1,
-                              "question": "What is ...?",
+                              "question": "What is ...?(max of 20 words)",
                               "options": ["Option 1", "Option 2", "Option 3", "Option 4", "Option5"],
                               "correctAnswer": 2,
                               "explanation": "Explanation for correct answer"
@@ -275,11 +278,13 @@ class GeminiViewModel(
 
 //                            Log.d("Quizzinghere brother",aiResponse.text.toString()   )
 
+                                Log.d("Quizzinghere", aiResponse.text.toString())
 
                             if (aiResponse.text?.isNotEmpty()!!) {
                                 creatingQuizzs.value = true
 
                                 loadQuizFromJson(aiResponse.text.toString())
+
 
                             } else creatingQuizzs.value = false
 
@@ -311,6 +316,7 @@ class GeminiViewModel(
     }
 
 
+    val sucessfulyCreatedQuizz = MutableStateFlow<Boolean>(false)
     private val _quizState = MutableStateFlow<Quiz?>(null)
     val quizState: StateFlow<Quiz?> = _quizState
 
@@ -319,6 +325,7 @@ class GeminiViewModel(
 
     fun loadQuizFromJson(rawJson: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            sucessfulyCreatedQuizz.value = false
             try {
                 val cleaned = sanitizeJson(rawJson)
                 Log.d("QuizViewModel", "Cleaned JSON: ${cleaned.take(200)}")
@@ -350,14 +357,18 @@ class GeminiViewModel(
                         )
                     )
                 }
-
+                sucessfulyCreatedQuizz.value = true
                 _quizState.value = Quiz(title = title, questions = questionsList)
+
+
+
                 _errorJson.value = null
                 Log.d("QuizViewModel", "Parsed ${questionsList.size} questions")
             } catch (e: Exception) {
                 Log.e("QuizViewModel", "Failed to parse JSON", e)
                 _errorJson.value = "Failed to parse quiz: ${e.message}"
                 _quizState.value = null
+                sucessfulyCreatedQuizz.value = false
             }
         }
     }
@@ -377,7 +388,3 @@ class GeminiViewModel(
         }
     }
 }
-
-class Person(
-    val id: Int, val name: String, val text: String, val age: Int
-)

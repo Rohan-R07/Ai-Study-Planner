@@ -2,6 +2,7 @@ package com.example.aistudyplanner.Quizz
 
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,15 +13,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.Scaffold
@@ -39,14 +36,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Unspecified
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalGraphicsContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavBackStack
 import com.example.aistudyplanner.Gemini.GeminiViewModel
@@ -112,22 +107,32 @@ fun ProcessingScreen(
 
 
         val extractedTextFromPdfSucessfull =
-            geminiViewModel.creatingQuizzs.collectAsState().value
+            geminiViewModel.sucessfulyCreatedQuizz.collectAsState().value
 //
         Log.d("ExtractedTexting", extractedTextFromPdfSucessfull.toString())
 
         val quizz = geminiViewModel.quizState.collectAsState()
-        if (quizz.value?.title.toString() != "null") {
+
+        Log.d("ExtractedTextingRohan", geminiViewModel.sucessfulyCreatedQuizz.collectAsState().value.toString())
+
+        if (quizz.value?.title.toString() != "null" ) {
+
+
+
+
             navBackStack.add(QuizzRoutes.QuizzPannel)
             navBackStack.remove(QuizzRoutes.QProcessingScreen)
             Log.d("ExtractedTexting", extractedTextFromPdfSucessfull.toString())
 
         }
 
-        Log.d("Title",quizz.value?.title.toString())
+        Log.d("pdfURL",pdfUri.toString())
 
+        val context1 = LocalContext.current
+
+        Log.d("ExtractedTexting", extractedTextFromPdfSucessfull.toString())
         LaunchedEffect(pdfUri) {
-            if (pdfUri != null) {
+            if (pdfUri != null ) {
 
                 geminiViewModel.generateQuizz()
 
@@ -137,6 +142,9 @@ fun ProcessingScreen(
                     processingStep = i
                     delay(1000) // Simulate processing time
                 }
+            }
+            else{
+                Toast.makeText(context1,"Error in reading the pdf",Toast.LENGTH_LONG).show()
             }
             Log.d("ExtractedTexting", extractedTextFromPdfSucessfull.toString())
         }
@@ -255,46 +263,7 @@ fun ProcessingScreen(
         }
     }
 
-    fun generateSampleQuiz(): Quiz {
-        return Quiz(
-            title = "Sample Quiz",
-            questions = listOf(
-                Question(
-                    id = 1,
-                    question = "What is the primary purpose of machine learning?",
-                    options = listOf(
-                        "To replace human intelligence",
-                        "To enable computers to learn from data",
-                        "To create artificial consciousness",
-                        "To automate all tasks"
-                    ),
-                    correctAnswer = 1
-                ),
-                Question(
-                    id = 2,
-                    question = "Which programming language is most commonly used for AI development?",
-                    options = listOf(
-                        "Java",
-                        "C++",
-                        "Python",
-                        "JavaScript"
-                    ),
-                    correctAnswer = 2
-                ),
-                Question(
-                    id = 3,
-                    question = "What does 'supervised learning' mean in machine learning?",
-                    options = listOf(
-                        "Learning without any data",
-                        "Learning with labeled training data",
-                        "Learning by trial and error",
-                        "Learning from unlabeled data"
-                    ),
-                    correctAnswer = 1
-                )
-            )
-        )
-    }
+
 
 
 }
