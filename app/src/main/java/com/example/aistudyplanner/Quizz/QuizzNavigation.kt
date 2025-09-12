@@ -67,9 +67,10 @@ fun QuizzNavigation(backStack: NavBackStack) {
 
             entry<QuizzRoutes.QuizzPannel> {
 //                currentQuiz?.let { quiz ->
-                QuizzPannel()
+                QuizzPannel(navBackStackEntry = backStack)
 //                }
             }
+
         }
     )
 }
