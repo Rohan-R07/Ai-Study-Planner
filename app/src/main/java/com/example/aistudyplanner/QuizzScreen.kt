@@ -74,25 +74,16 @@ class QuizzScreen : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val geminiViewModel = viewModels<GeminiViewModel>(
-            factoryProducer = {
-                object : ViewModelProvider.Factory {
-                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                        return GeminiViewModel(applicationContext) as T
-                    }
-                }
-            }
-        )
-
-
-
         enableEdgeToEdge()
         setContent {
             AIStudyPlannerTheme {
                 val navBackStack = rememberNavBackStack<QuizzRoutes>(QuizzRoutes.QmainScreen)
 
                 QuizzNavigation(
-                    navBackStack
+                    navBackStack,
+                    onBack = {
+                        finish()
+                    }
                 )
 
             }

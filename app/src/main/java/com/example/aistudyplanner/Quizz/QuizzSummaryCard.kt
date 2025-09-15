@@ -1,6 +1,7 @@
 package com.example.aistudyplanner.Quizz
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
@@ -34,7 +36,8 @@ import androidx.compose.ui.unit.dp
 fun QuizSummaryCard(
     totalQuestions: Int,
     correctAnswers: Int,
-    onRetakeQuiz: () -> Unit
+    onRetakeQuiz: () -> Unit,
+    exitQuizz: () -> Unit
 ) {
     val percentage = (correctAnswers * 100) / totalQuestions
     val resultColor = when {
@@ -82,33 +85,40 @@ fun QuizSummaryCard(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            FilledTonalButton(
-                onClick = onRetakeQuiz,
-                shape = RoundedCornerShape(12.dp)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
             ) {
-                Icon(
-                    imageVector = Icons.Default.Refresh,
-                    contentDescription = "Retake Quiz",
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Retake Quiz")
+
+                FilledTonalButton(
+                    onClick = onRetakeQuiz,
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "Retake Quiz",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Retake Quiz")
+                }
+
+                Spacer(Modifier.padding(20.dp))
+
+                FilledTonalButton(
+                    onClick = { exitQuizz.invoke() },
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Default.ExitToApp,
+                        contentDescription = "Retake Quiz",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Exit Quiz")
+                }
             }
+
         }
     }
-}
-
-@Preview
-@Composable
-fun DEIDIWOFJIEJOI() {
-
-    QuizSummaryCard(
-        totalQuestions = 30,
-        correctAnswers = 3,
-        onRetakeQuiz = {
-
-        }
-    )
-
-
 }
