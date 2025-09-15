@@ -1,8 +1,11 @@
 package com.example.aistudyplanner.Quizz
 
 import android.R
+import android.app.Activity
+import android.content.Intent
 import android.util.Log
 import android.widget.Button
+import android.widget.Toast
 import androidx.arch.core.executor.TaskExecutor
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -60,14 +63,18 @@ import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.disableHotReloadMode
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
@@ -80,6 +87,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -87,6 +96,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.rememberNavBackStack
 import com.example.aistudyplanner.Gemini.GeminiViewModel
+import com.example.aistudyplanner.MainActivity
+import com.example.aistudyplanner.QuizzScreen
 import com.example.aistudyplanner.ui.theme.CBackground
 import com.example.aistudyplanner.ui.theme.CDotFocusedColor
 import com.example.aistudyplanner.ui.theme.CDotUnFocusedColour
@@ -97,7 +108,8 @@ import org.bouncycastle.jcajce.provider.asymmetric.ec.SignatureSpi
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuizzPannel(
-    navBackStackEntry: NavBackStack
+    navBackStackEntry: NavBackStack,
+    exitQuizz:() -> Unit
 ) {
 
     val context = LocalContext.current
@@ -109,6 +121,10 @@ fun QuizzPannel(
     })
 
     val quizz = geminiViewMoedl.quizState.collectAsState()
+
+    val correctness = remember { mutableStateMapOf<Int, Int>() }
+
+    val answers = remember { mutableStateMapOf<Int, String?>() }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(), topBar = {
@@ -124,29 +140,25 @@ fun QuizzPannel(
                     titleContentColor = White,
                     actionIconContentColor = White,
                     subtitleContentColor = White
-                ),
-                navigationIcon = {
+                ), navigationIcon = {
                     IconButton(
                         onClick = {
                             navBackStackEntry.remove(QuizzRoutes.QuizzPannel)
-                        }
-                    ) { }
-                }
-            )
+                        }) { }
+                })
         }, contentColor = CBackground
     ) { innerPadding ->
 
-        var selectedQuestionId by remember { mutableStateOf<Int?>(null) }
-        var showAnswers by remember { mutableStateOf(false) }
-        var completedQuestions by remember { mutableStateOf(setOf<Int>()) }
-        var userAnswers by remember { mutableStateOf(mapOf<Int, Int>()) }
+        val answers = remember {
+            mutableStateMapOf<Int, String?>()
+        }
 
         val stateShifter = remember { mutableStateOf(true) }
         val currentSteps = remember { mutableStateOf(0) }
         val totalSteps = quizz.value?.totalQuestions?.toInt()
 
+        val kindOffWorking = totalSteps.toString() == currentSteps.value.toString()
 
-        val previousBUttonDisabled = remember { mutableStateOf(false) }
 
         Column(
             modifier = Modifier
@@ -159,135 +171,206 @@ fun QuizzPannel(
 
             val listState = rememberLazyListState()
 
-            val lazyRowIndex = remember { mutableIntStateOf(0) }
-
             val courutoneScop = rememberCoroutineScope()
 
-            AnimatedVisibility(
+            AnimatedContent (
                 stateShifter.value,
                 modifier = Modifier.fillMaxSize(),
 
-                ) {
+                ) { stating ->
+
+                if(stating){
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+
+                        item {
+
+                            SegmentedProgressBar(
+                                totalSegments = totalSteps.toString().toInt(),
+                                currentStep = currentSteps.value,
+                                filledColor = CDotFocusedColor,
+                                emptyColor = CDotUnFocusedColour,
+                                modifier = Modifier.padding(20.dp)
+                            )
+
+                            LazyRow(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentHeight()
+                                    .padding(20.dp),
+                                userScrollEnabled = false,
+                                state = listState
+                            ) {
+
+                                itemsIndexed(quizz.value?.questions ?: emptyList()) { index, question ->
+
+                                    Log.d("QUestion", question.question)
+
+                                    Spacer(Modifier.padding(9.dp))
 
 
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                                    McqCard(
+                                        question = question.question,
+                                        options = question.options,
+                                        onOptionSelected = { selected ->
+                                            answers[index] = selected
 
-                    item {
-                        SegmentedProgressBar(
-                            totalSegments = totalSteps.toString().toInt(),
-                            currentStep = currentSteps.value,
-                            filledColor = CDotFocusedColor,
-                            emptyColor = CDotUnFocusedColour,
-                            modifier = Modifier.padding(20.dp)
+                                        },
+                                        index = index,
+                                        modifier = Modifier,
+                                        correctAns = { ansCount ->
+                                            correctness[index] = ansCount  // 👈 store whether it’s correct or not
+                                        },
+                                        correctAnswer = question.correctAnswer
+                                    )
+
+                                    Spacer(Modifier.padding(14.dp))
+
+
+                                }
+
+
+                            }
+
+
+                        }
+
+
+
+
+                        item {
+                            Row {
+                                // Previous Button
+                                Button(
+                                    onClick = {
+                                        if (currentSteps.value > 1) {
+                                            val targetIndex =
+                                                currentSteps.value - 2 // because steps are 1-based
+                                            courutoneScop.launch {
+                                                listState.animateScrollToItem(targetIndex)
+                                            }
+                                            currentSteps.value -= 1 // decrement only once
+                                        }
+                                    }, colors = ButtonDefaults.buttonColors(
+                                        containerColor = CDotFocusedColor,
+                                        contentColor = White,
+                                        disabledContainerColor = Color.Gray,
+                                        disabledContentColor = White.copy(alpha = 0.5f)
+                                    ), enabled = currentSteps.value > 1
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
+                                            contentDescription = null
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(text = "Previous")
+                                    }
+                                }
+
+                                Spacer(Modifier.padding(20.dp))
+
+                                // Next Button
+                                Button(
+                                    onClick = {
+
+                                        if (!kindOffWorking) {
+
+                                            if (currentSteps.value < totalSteps.toString().toInt()) {
+                                                val targetIndex =
+                                                    currentSteps.value // because steps start from 1
+                                                courutoneScop.launch {
+                                                    listState.animateScrollToItem(targetIndex)
+                                                }
+                                                currentSteps.value += 1 // increment only once
+                                            }
+                                        }else{
+                                            if (answers.size < totalSteps.toString().toInt()) {
+                                                Toast.makeText(
+                                                    context,
+                                                    "Please answer all questions before submitting.",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            } else {
+                                                stateShifter.value = false
+                                            }
+                                        }
+
+                                    }, colors = ButtonDefaults.buttonColors(
+                                        containerColor = if (kindOffWorking) Green else CDotFocusedColor,
+                                        contentColor = if (kindOffWorking) Black else White
+                                    )
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        Text(text = if (kindOffWorking) "Submit" else "Next")
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Icon(
+                                            imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
+                                            contentDescription = null
+                                        )
+                                    }
+                                }
+                            }
+
+
+                        }
+
+
+
+                        item {
+                            Column(
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                Text(
+                                    "Your Answers:",
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+
+                                (quizz.value?.questions
+                                    ?: emptyList()).forEachIndexed { index, q ->
+                                    Text("Q${index + 1}: ${answers[index] ?: "Not Answered"}")
+                                }
+                            }
+                        }
+
+                    }
+
+                }
+                else{
+                    val context = LocalContext.current
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        QuizSummaryCard(
+                            totalQuestions = totalSteps ?: 0,
+                            correctAnswers = correctness.values.sum(),
+                            onRetakeQuiz = {
+                                stateShifter.value = true
+                                currentSteps.value = 1
+                                answers.clear()
+                            },
+                            exitQuizz = {
+                                val intent = Intent(context, MainActivity::class.java).apply {
+                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                }
+                                ContextCompat.startActivity(context, intent, null)
+
+//                                exitQuizz.invoke()
+                            }
                         )
-
-                        LazyRow(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentHeight()
-                                .padding(20.dp),
-                            userScrollEnabled = false,
-                            state = listState
-                        ) {
-
-                            itemsIndexed(quizz.value?.questions ?: emptyList()) { index, question ->
-
-                                Log.d("QUestion", question.question)
-
-                                Spacer(Modifier.padding(9.dp))
-
-                                McqCard(
-                                    question = question.question,
-                                    options = question.options,
-                                    onOptionSelected = {
-
-                                    },
-                                    index = index,
-                                    modifier = Modifier
-                                )
-
-                                Spacer(Modifier.padding(14.dp))
-                            }
-
-                        }
-
                     }
-
-
-
-
-                    item {
-                        Row {
-                            // Previous Button
-                            Button(
-                                onClick = {
-                                    if (currentSteps.value > 1) {
-                                        val targetIndex =
-                                            currentSteps.value - 2 // because steps are 1-based
-                                        courutoneScop.launch {
-                                            listState.animateScrollToItem(targetIndex)
-                                        }
-                                        currentSteps.value -= 1 // decrement only once
-                                    }
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = CDotFocusedColor,
-                                    contentColor = White,
-                                    disabledContainerColor = Color.Gray,
-                                    disabledContentColor = White.copy(alpha = 0.5f)
-                                ),
-                                enabled = currentSteps.value > 1
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
-                                        contentDescription = null
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(text = "Previous")
-                                }
-                            }
-
-                            Spacer(Modifier.padding(20.dp))
-
-                            // Next Button
-                            Button(
-                                onClick = {
-                                    if (currentSteps.value < totalSteps.toString().toInt()) {
-                                        val targetIndex =
-                                            currentSteps.value // because steps start from 1
-                                        courutoneScop.launch {
-                                            listState.animateScrollToItem(targetIndex)
-                                        }
-                                        currentSteps.value += 1 // increment only once
-                                    }
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = CDotFocusedColor,
-                                    contentColor = White
-                                )
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    Text(text = "Next")
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
-                                        contentDescription = null
-                                    )
-                                }
-                            }
-                        }
-                    }
-
                 }
 
             }

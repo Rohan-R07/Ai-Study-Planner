@@ -22,11 +22,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,11 +54,13 @@ import androidx.navigation3.runtime.NavBackStack
 import com.example.aistudyplanner.BottomNavigation.BottomNavBarItems
 import com.example.aistudyplanner.Gemini.GeminiViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuizzMainScreen(
     onUploadPdf: (Uri) -> Unit,
     isGenerating: Boolean,
-    navBackState: NavBackStack
+    navBackState: NavBackStack,
+    backButton: () -> Unit
 ) {
     val context = LocalContext.current
     val isPDFSelected = remember { mutableStateOf<Boolean?>(null) }
@@ -71,13 +78,34 @@ fun QuizzMainScreen(
         }
     }
 
-    val nextScreen = remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
 
-        ) { innerPadding ->
+                },
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            backButton.invoke()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(40.dp),
+
+                            )
+                    }
+                }
+            )
+        }
+
+    ) { innerPadding ->
 
 
         Column(
@@ -216,9 +244,6 @@ fun QuizzMainScreen(
                     FeatureItem("⚡", "Instant Results", "Get your quiz in seconds")
                 }
             }
-
-
-
 
 
         }

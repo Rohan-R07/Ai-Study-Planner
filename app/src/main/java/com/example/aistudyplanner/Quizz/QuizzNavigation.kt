@@ -19,7 +19,7 @@ import androidx.navigation3.ui.NavDisplay
 import com.example.aistudyplanner.Gemini.GeminiViewModel
 
 @Composable
-fun QuizzNavigation(backStack: NavBackStack) {
+fun QuizzNavigation(backStack: NavBackStack,onBack: () -> Unit) {
 
     var currentScreen by remember { mutableStateOf<QuizzRoutes>(QuizzRoutes.QmainScreen) }
     var selectedPdfUri by remember { mutableStateOf<Uri?>(null) }
@@ -48,7 +48,10 @@ fun QuizzNavigation(backStack: NavBackStack) {
                         selectedPdfUri = uri
                         geminiViewModel.setPDfquizz(uri)
                         currentScreen = QuizzRoutes.QProcessingScreen
-                    }, isGenerating = isGeneratingQuiz, navBackState = backStack
+                    }, isGenerating = isGeneratingQuiz, navBackState = backStack,
+                    backButton = {
+                        onBack.invoke()
+                    }
 
                 )
             }
@@ -67,7 +70,9 @@ fun QuizzNavigation(backStack: NavBackStack) {
 
             entry<QuizzRoutes.QuizzPannel> {
 //                currentQuiz?.let { quiz ->
-                QuizzPannel(navBackStackEntry = backStack)
+                QuizzPannel(navBackStackEntry = backStack, exitQuizz = {
+                    onBack.invoke()
+                })
 //                }
             }
 

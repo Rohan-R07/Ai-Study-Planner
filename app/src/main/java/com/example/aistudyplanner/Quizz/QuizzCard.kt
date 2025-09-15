@@ -46,9 +46,13 @@ fun McqCard(
     options: List<String>,
     onOptionSelected: (String?) -> Unit,
     modifier: Modifier = Modifier,
-    index: Int
+    index: Int,
+    correctAns:(Int) -> Unit,
+    correctAnswer: Int,   // 👈 NEW param
+
 ) {
     var selectedOption by rememberSaveable (index) { mutableStateOf<String?>(null) }
+
 
     Card(
         modifier = modifier
@@ -58,30 +62,28 @@ fun McqCard(
         elevation = CardDefaults.cardElevation(6.dp),
         colors = CardDefaults.cardColors(containerColor = Pink40)
     ) {
-        Column(modifier = Modifier.padding(16.dp).fillMaxSize()) {
-            Text(
-                text = "Question: ${index + 1} ",
-                color = White,
-                fontSize = 13.sp
-            )
-
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxSize()
+        ) {
+            Text(text = "Question: ${index + 1}", color = White, fontSize = 13.sp)
             Spacer(Modifier.padding(10.dp))
+            Text(text = question, style = MaterialTheme.typography.titleMedium, color = White)
 
-            Text(
-                text = question,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(bottom = 12.dp),
-                color = White
-            )
-
-            options.forEach { option ->
+            options.forEachIndexed { optionIndex, option ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
                             selectedOption = if (selectedOption == option) null else option
-                            onOptionSelected(selectedOption)   // return updated selection
+                            onOptionSelected(selectedOption)
+
+                            // ✅ check correctness
+                            val isCorrect =
+                                if (selectedOption != null && optionIndex == correctAnswer) 1 else 0
+                            correctAns(isCorrect)
                         }
                         .padding(vertical = 8.dp)
                 ) {
@@ -90,6 +92,10 @@ fun McqCard(
                         onClick = {
                             selectedOption = if (selectedOption == option) null else option
                             onOptionSelected(selectedOption)
+
+                            val isCorrect =
+                                if (selectedOption != null && optionIndex == correctAnswer) 1 else 0
+                            correctAns(isCorrect)
                         }
                     )
                     Text(
@@ -102,15 +108,4 @@ fun McqCard(
             }
         }
     }
-}
-
-@Preview
-@Composable
-private fun HFHG() {
-    McqCard(
-        question = "What is the capital of France?",
-        options = listOf("Berlin", "Madrid", "Paris", "Rome"),
-        onOptionSelected = {},
-        index = 3
-    )
 }
