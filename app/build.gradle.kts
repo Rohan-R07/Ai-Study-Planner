@@ -106,6 +106,8 @@ dependencies {
 
     implementation(libs.tom.roush.pdfbox.android)
 
+    implementation(libs.androidx.datastore.preferences)
+
     implementation(libs.androidx.material3.v140alpha14)
 
 

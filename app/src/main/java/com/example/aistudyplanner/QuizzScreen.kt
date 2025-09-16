@@ -60,6 +60,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import com.example.aistudyplanner.Gemini.GeminiViewModel
 import com.example.aistudyplanner.Quizz.QuizzNavigation
 import com.example.aistudyplanner.Quizz.QuizzRoutes
+import com.example.aistudyplanner.Recents.RecentsDataStoreVM
 import com.example.aistudyplanner.Utils.generatePdfPreview
 import com.example.aistudyplanner.Utils.getPdfFileName
 import com.example.aistudyplanner.ui.theme.AIStudyPlannerTheme
@@ -74,6 +75,17 @@ class QuizzScreen : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
+        val recentsvViewModel = viewModels<RecentsDataStoreVM>(
+            factoryProducer = {
+                object : ViewModelProvider.Factory{
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                        return RecentsDataStoreVM(application) as T
+                    }
+                }
+            }
+        )
+
         enableEdgeToEdge()
         setContent {
             AIStudyPlannerTheme {
@@ -83,7 +95,8 @@ class QuizzScreen : ComponentActivity() {
                     navBackStack,
                     onBack = {
                         finish()
-                    }
+                    },
+                    application
                 )
 
             }

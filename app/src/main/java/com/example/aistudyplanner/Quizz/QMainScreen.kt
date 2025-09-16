@@ -4,6 +4,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -53,6 +54,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavBackStack
 import com.example.aistudyplanner.BottomNavigation.BottomNavBarItems
 import com.example.aistudyplanner.Gemini.GeminiViewModel
+import com.example.aistudyplanner.Recents.RecentsDataStoreVM
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,8 +62,21 @@ fun QuizzMainScreen(
     onUploadPdf: (Uri) -> Unit,
     isGenerating: Boolean,
     navBackState: NavBackStack,
-    backButton: () -> Unit
+    backButton: () -> Unit,
+    application: android.app.Application
 ) {
+
+    val recentsvViewModel = viewModel<RecentsDataStoreVM>(
+        factory =
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return RecentsDataStoreVM(application) as T
+                }
+
+            }
+    )
+
+
     val context = LocalContext.current
     val isPDFSelected = remember { mutableStateOf<Boolean?>(null) }
     val pdfLauncher = rememberLauncherForActivityResult(
@@ -73,6 +88,8 @@ fun QuizzMainScreen(
 
         if (uri != null) {
             isPDFSelected.value = true
+
+            recentsvViewModel.addRecentPdf(uri)
         } else {
             isPDFSelected.value = false
         }

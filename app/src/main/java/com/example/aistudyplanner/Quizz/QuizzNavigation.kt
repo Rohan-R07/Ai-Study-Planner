@@ -1,5 +1,6 @@
 package com.example.aistudyplanner.Quizz
 
+import android.app.Application
 import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -19,11 +20,10 @@ import androidx.navigation3.ui.NavDisplay
 import com.example.aistudyplanner.Gemini.GeminiViewModel
 
 @Composable
-fun QuizzNavigation(backStack: NavBackStack,onBack: () -> Unit) {
+fun QuizzNavigation(backStack: NavBackStack,onBack: () -> Unit,application: Application) {
 
     var currentScreen by remember { mutableStateOf<QuizzRoutes>(QuizzRoutes.QmainScreen) }
     var selectedPdfUri by remember { mutableStateOf<Uri?>(null) }
-    var currentQuiz by remember { mutableStateOf<Quiz?>(null) }
     var isGeneratingQuiz by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
@@ -51,7 +51,8 @@ fun QuizzNavigation(backStack: NavBackStack,onBack: () -> Unit) {
                     }, isGenerating = isGeneratingQuiz, navBackState = backStack,
                     backButton = {
                         onBack.invoke()
-                    }
+                    },
+                    application
 
                 )
             }
