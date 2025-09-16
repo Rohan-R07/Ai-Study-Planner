@@ -71,8 +71,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.unpackFloat1
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.aistudyplanner.Gemini.GeminiViewModel
+import com.example.aistudyplanner.Recents.RecentsDataStoreVM
 import com.example.aistudyplanner.Utils.generatePdfPreview
 import com.example.aistudyplanner.Utils.getPdfFileName
 import com.example.aistudyplanner.pdfExtaction.PdfFilePicker
@@ -121,6 +124,17 @@ class PdfSumScreen : ComponentActivity() {
 
             var showCopySuccess by remember { mutableStateOf(false) }
 
+            val recentsvViewModel = viewModels<RecentsDataStoreVM>(
+                factoryProducer = {
+                    object : ViewModelProvider.Factory{
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            return RecentsDataStoreVM(application) as T
+                        }
+                    }
+                }
+            )
+
+
             val coroutineScope = rememberCoroutineScope()
 
             val pdfPickerLauncher = rememberLauncherForActivityResult(
@@ -130,6 +144,8 @@ class PdfSumScreen : ComponentActivity() {
                             uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
                         )
 
+
+                        recentsvViewModel.value.addRecentPdf(uri)
                         geminiViewModel.value.setPdfUri(uri)
                     }
                     uri?.let {

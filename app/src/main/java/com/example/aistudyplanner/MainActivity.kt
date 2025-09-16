@@ -47,6 +47,8 @@ class MainActivity : ComponentActivity() {
                 }
             }
         )
+
+
         val googleViewModel = viewModels<FirebaseAuthViewModel>(
             factoryProducer = {
                 object : ViewModelProvider.Factory {
@@ -60,6 +62,8 @@ class MainActivity : ComponentActivity() {
             }
         )
 
+
+
         enableEdgeToEdge()
         setContent {
             AIStudyPlannerTheme {
@@ -72,7 +76,8 @@ class MainActivity : ComponentActivity() {
                         applicationContext,
                         googleViewModel.value,
                         innerPadding,
-                        geminiViewModel.value
+                        geminiViewModel.value,
+                        application
                     )
                 }
             }

@@ -1,5 +1,6 @@
 package com.example.aistudyplanner.MainNavigation
 
+import android.app.Application
 import android.content.Context
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -22,7 +23,7 @@ import com.example.aistudyplanner.Screeens.MainScreens
 import com.example.aistudyplanner.Screeens.SplashScreen
 
 @Composable
-fun MainNavigation(mainNavbackStack: NavBackStack,context: Context, firebaseAuthViewModel: FirebaseAuthViewModel, innerpadding: PaddingValues,geminiViewModel: GeminiViewModel) {
+fun MainNavigation(mainNavbackStack: NavBackStack,context: Context, firebaseAuthViewModel: FirebaseAuthViewModel, innerpadding: PaddingValues,geminiViewModel: GeminiViewModel,application: Application) {
 
 
     NavDisplay(
@@ -67,10 +68,8 @@ fun MainNavigation(mainNavbackStack: NavBackStack,context: Context, firebaseAuth
             entry<MRoutes.MainScreen> {
 
                 MainScreens(
-                    firebaseAuthViewModel = firebaseAuthViewModel,
-                    mainNavbackStack = mainNavbackStack,
-                    context,
-                    geminiViewModel
+                    geminiViewModel,
+                    application
                 )
             }
         }

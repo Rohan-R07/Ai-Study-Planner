@@ -30,8 +30,8 @@ import com.example.aistudyplanner.ui.theme.CDotUnFocusedColour
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HorizontalPagerWithSmoothDots(firebaseAuthViewModel: FirebaseAuthViewModel,mainNavBackStack: NavBackStack) {
-    val pageCount = 3 // Number of pages in the pager
-    // Create a PagerState with the initial page and page count
+    val pageCount = 3
+
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { pageCount })
 
     Column(

@@ -1,5 +1,6 @@
 package com.example.aistudyplanner.BottomNavigation
 
+import android.app.Application
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -24,14 +25,16 @@ import com.example.aistudyplanner.NestedScreens.ProfileScreen
 import com.example.aistudyplanner.OnBoarding.HorizontalPagerWithSmoothDots
 import com.example.aistudyplanner.Screeens.MainScreens
 import com.example.aistudyplanner.Screeens.SplashScreen
+import com.example.aistudyplanner.mApplication
 
 
 @Composable
-fun BotttomNavGrpah(bbackstack: NavBackStack, firebaseAuthViewModel: FirebaseAuthViewModel,innerPadding: PaddingValues,geminiViewModel: GeminiViewModel) {
+fun BotttomNavGrpah(bbackstack: NavBackStack, application: Application,geminiViewModel: GeminiViewModel,innerPadding: PaddingValues) {
 
 
     NavDisplay(
         modifier = Modifier
+            .padding(innerPadding)
             .padding(10.dp),
         backStack = bbackstack,
         onBack = {
@@ -58,7 +61,7 @@ fun BotttomNavGrpah(bbackstack: NavBackStack, firebaseAuthViewModel: FirebaseAut
         entryProvider = entryProvider {
 
             entry<BRoutes.HomeScreen> {
-                HomeScreen(bbackstack, geminiViewModel =geminiViewModel )
+                HomeScreen(bbackstack, geminiViewModel =geminiViewModel,application )
             }
 
 

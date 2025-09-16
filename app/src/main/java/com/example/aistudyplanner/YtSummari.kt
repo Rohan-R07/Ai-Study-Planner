@@ -73,7 +73,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.example.aistudyplanner.Gemini.GeminiViewModel
+import com.example.aistudyplanner.Recents.RecentsDataStoreVM
 import com.example.aistudyplanner.ui.theme.AIStudyPlannerTheme
 import com.example.aistudyplanner.ui.theme.CDotFocusedColor
 import com.example.aistudyplanner.ui.theme.CDotUnFocusedColour
@@ -138,10 +141,10 @@ class YtSummari : ComponentActivity() {
                     Log.d("GoogleAi", summary.toString())
 
                     Log.d("googleError", isLoading.toString())
+
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-
                             .padding(innerPadding)
                             .padding(10.dp)
                             .verticalScroll(rememberScrollState()),
@@ -384,14 +387,6 @@ class YtSummari : ComponentActivity() {
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
 
-                                        // Copy button could be added here
-//                                        TextButton(
-//                                            onClick = { /* Handle copy */ }
-//                                        ) {
-//                                            Text("Copy")
-//                                        }
-
-                                        // download button could be added here
                                         IconButton(
                                             onClick = {}
                                         ) {

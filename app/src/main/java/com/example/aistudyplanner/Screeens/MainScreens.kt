@@ -1,5 +1,6 @@
 package com.example.aistudyplanner.Screeens
 
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import androidx.activity.viewModels
@@ -44,10 +45,8 @@ import kotlin.jvm.java
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreens(
-    firebaseAuthViewModel: FirebaseAuthViewModel,
-    mainNavbackStack: androidx.navigation3.runtime.NavBackStack,
-    context: Context,
-    geminiViewModel: GeminiViewModel
+    geminiViewModel: GeminiViewModel,
+    application: Application
 ) {
 
     val bottomNavBackStack = rememberNavBackStack<BRoutes>(BRoutes.HomeScreen)
@@ -138,10 +137,10 @@ fun MainScreens(
     ) { innerpadding ->
 
         BotttomNavGrpah(
-            bottomNavBackStack,
-            firebaseAuthViewModel,
-            innerpadding,
-            geminiViewModel
+            bbackstack = bottomNavBackStack,
+            application = application,
+            geminiViewModel = geminiViewModel,
+            innerPadding = innerpadding
         )
     }
 }
