@@ -187,12 +187,7 @@ fun ProcessingScreen(
                                 .size(100.dp)
                         )
 
-//                        Icon(
-//                            imageVector = Icons.Default.Add,
-//                            contentDescription = "Processing",
-//                            modifier = Modifier.size(40.dp),
-//                            tint = Color(0xFF667eea)
-//                        )
+
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))

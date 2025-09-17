@@ -110,5 +110,6 @@ dependencies {
 
     implementation(libs.androidx.material3.v140alpha14)
 
+    implementation(libs.material3)
 
 }
