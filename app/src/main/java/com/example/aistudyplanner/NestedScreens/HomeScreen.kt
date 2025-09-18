@@ -1,6 +1,7 @@
 package com.example.aistudyplanner.NestedScreens
 
 import android.app.Application
+import android.content.Intent
 import android.widget.Space
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -59,6 +60,7 @@ import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalGraphicsContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -71,6 +73,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavBackStack
 import com.example.aistudyplanner.BottomNavigation.BRoutes
 import com.example.aistudyplanner.Gemini.GeminiViewModel
+import com.example.aistudyplanner.PdfSumScreen
+import com.example.aistudyplanner.QuizzScreen
 import com.example.aistudyplanner.R
 import com.example.aistudyplanner.Recents.RecentsCard
 import com.example.aistudyplanner.Recents.RecentsDataStoreVM
@@ -226,6 +230,8 @@ fun HomeScreen(
 
                         }
 
+                        val context = LocalContext.current
+
                         if (showBottomSheet) {
                             ModalBottomSheet(
                                 onDismissRequest = {
@@ -267,6 +273,11 @@ fun HomeScreen(
                                             openedAt = 343434L
                                         ),
                                         onFileClick = { recentsPDF ->
+                                            val intent = Intent(
+                                                context,
+                                                PdfSumScreen::class.java
+                                            )
+                                            context.startActivity(intent)
 
                                         },
                                         modifier = Modifier,
@@ -282,6 +293,12 @@ fun HomeScreen(
                                             openedAt = 343434L,
                                         ),
                                         onFileClick = { recentsPDF ->
+
+                                            val intent = Intent(
+                                                context,
+                                                QuizzScreen::class.java
+                                            )
+                                            context.startActivity(intent)
 
                                         },
                                         modifier = Modifier,
