@@ -71,6 +71,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.unpackFloat1
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -111,6 +112,8 @@ class PdfSumScreen : ComponentActivity() {
                     }
                 })
 
+            val value = intent.getStringExtra("key") // Replace with the appropriate type
+
 
             val context = LocalContext.current
             val summaryResonse = geminiViewModel.value.summary.collectAsState()
@@ -126,7 +129,7 @@ class PdfSumScreen : ComponentActivity() {
 
             val recentsvViewModel = viewModels<RecentsDataStoreVM>(
                 factoryProducer = {
-                    object : ViewModelProvider.Factory{
+                    object : ViewModelProvider.Factory {
                         override fun <T : ViewModel> create(modelClass: Class<T>): T {
                             return RecentsDataStoreVM(application) as T
                         }
@@ -139,24 +142,31 @@ class PdfSumScreen : ComponentActivity() {
 
             val pdfPickerLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.OpenDocument(), onResult = { uri ->
-                    if (uri != null) {
-                        context.contentResolver.takePersistableUriPermission(
-                            uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
-                        )
+
+                    if (value == null) {
+                        if (uri != null) {
+                            context.contentResolver.takePersistableUriPermission(
+                                uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            )
 
 
-                        recentsvViewModel.value.addRecentPdf(uri)
-                        geminiViewModel.value.setPdfUri(uri)
-                    }
-                    uri?.let {
-                        selectedPdfUri = it
-                        pdfName = getPdfFileName(context, it)
-
-                        coroutineScope.launch {
-                            pdfPreviewBitmap = generatePdfPreview(context, it)
+                            recentsvViewModel.value.addRecentPdf(uri)
+                            geminiViewModel.value.setPdfUri(uri)
                         }
+                        uri?.let {
+                            selectedPdfUri = it
+                            pdfName = getPdfFileName(context, it)
+
+                            coroutineScope.launch {
+                                pdfPreviewBitmap = generatePdfPreview(context, it)
+                            }
+                        }
+                    } else {
+                        geminiViewModel.value.setPdfUri(value.toUri())
+
                     }
-                })
+                }
+            )
 
 
             AIStudyPlannerTheme {
@@ -249,8 +259,10 @@ class PdfSumScreen : ComponentActivity() {
                                         )
 
                                         // PDf Selection Button
+
                                         Button(
-                                            onClick = { pdfPickerLauncher.launch(arrayOf("application/pdf")) },
+                                            onClick = {
+                                                pdfPickerLauncher.launch(arrayOf("application/pdf")) },
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .height(56.dp),
@@ -271,7 +283,7 @@ class PdfSumScreen : ComponentActivity() {
 
                                         // PDF selected preview and info button
 
-                                        selectedPdfUri?.let { uri ->
+                                        selectedPdfUri?.let {
 
                                             Spacer(modifier = Modifier.height(24.dp))
 
