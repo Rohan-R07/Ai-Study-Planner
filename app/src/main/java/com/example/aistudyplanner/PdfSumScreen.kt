@@ -10,6 +10,8 @@ import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -76,6 +78,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.aistudyplanner.Gemini.GeminiViewModel
+import com.example.aistudyplanner.Recents.DirectUriPdfSummarizerScreen
 import com.example.aistudyplanner.Recents.RecentsDataStoreVM
 import com.example.aistudyplanner.Utils.generatePdfPreview
 import com.example.aistudyplanner.Utils.getPdfFileName
@@ -112,8 +115,10 @@ class PdfSumScreen : ComponentActivity() {
                     }
                 })
 
-            val value = intent.getStringExtra("key") // Replace with the appropriate type
+            val value = intent.getStringExtra("URI_KEY") // Replace with the appropriate type
 
+
+            val isURIpresent = remember { mutableStateOf(value) }
 
             val context = LocalContext.current
             val summaryResonse = geminiViewModel.value.summary.collectAsState()
@@ -140,368 +145,393 @@ class PdfSumScreen : ComponentActivity() {
 
             val coroutineScope = rememberCoroutineScope()
 
-            val pdfPickerLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.OpenDocument(), onResult = { uri ->
-
-                    if (value == null) {
-                        if (uri != null) {
-                            context.contentResolver.takePersistableUriPermission(
-                                uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
-                            )
-
-
-                            recentsvViewModel.value.addRecentPdf(uri)
-                            geminiViewModel.value.setPdfUri(uri)
-                        }
-                        uri?.let {
-                            selectedPdfUri = it
-                            pdfName = getPdfFileName(context, it)
-
-                            coroutineScope.launch {
-                                pdfPreviewBitmap = generatePdfPreview(context, it)
-                            }
-                        }
-                    } else {
-                        geminiViewModel.value.setPdfUri(value.toUri())
-
-                    }
-                }
-            )
-
-
             AIStudyPlannerTheme {
+                if (isURIpresent.value == null) {
 
-                Scaffold(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    topBar = {
-                        CenterAlignedTopAppBar(
-                            title = {
-                                Text(
-                                    text = "Summarize PDF",
-                                    color = White,
-                                    fontSize = 20.sp
+                    val pdfPickerLauncher = rememberLauncherForActivityResult(
+                        contract = ActivityResultContracts.OpenDocument(), onResult = { uri ->
+
+                            if (uri != null) {
+                                context.contentResolver.takePersistableUriPermission(
+                                    uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
                                 )
-                            },
-                            navigationIcon = {
-                                IconButton(
-                                    modifier = Modifier,
-                                    onClick = {
-                                        finish()
-                                    }
-                                ) {
-                                    Icon(
-
-                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                        contentDescription = null,
-                                        modifier = Modifier
-                                            .padding(10.dp)
-                                    )
-                                }
 
 
+                                recentsvViewModel.value.addRecentPdf(uri)
+                                geminiViewModel.value.setPdfUri(uri)
                             }
-                        )
-                    },
-                    contentColor = CBackground
-                ) { innerPadding ->
-                    LazyColumn(
+                            uri?.let {
+                                selectedPdfUri = it
+                                pdfName = getPdfFileName(context, it)
+
+                                coroutineScope.launch {
+                                    pdfPreviewBitmap = generatePdfPreview(context, it)
+                                }
+                            }
+                        }
+                    )
+
+
+
+                    Scaffold(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding)
-                    ) {
-
-
-                        item {
-                            Column(
-                                modifier = Modifier
-                                    .background(CBackground)
-                            ) {
-
-                                Card(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(bottom = 24.dp),
-                                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = CBackground,
+                            .fillMaxSize(),
+                        topBar = {
+                            CenterAlignedTopAppBar(
+                                title = {
+                                    Text(
+                                        text = "Summarize PDF",
+                                        color = White,
+                                        fontSize = 20.sp
                                     )
+                                },
+                                navigationIcon = {
+                                    IconButton(
+                                        modifier = Modifier,
+                                        onClick = {
+                                            finish()
+                                        }
+                                    ) {
+                                        Icon(
 
+                                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                            contentDescription = null,
+                                            modifier = Modifier
+                                                .padding(10.dp)
+                                        )
+                                    }
+
+
+                                }
+                            )
+                        },
+                        contentColor = CBackground
+                    ) { innerPadding ->
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding)
+                        ) {
+
+
+                            item {
+                                Column(
+                                    modifier = Modifier
+                                        .background(CBackground)
                                 ) {
 
 
-                                    Column(
+                                    Card(
                                         modifier = Modifier
-                                            .padding(20.dp)
-                                            .background(CBackground),
-                                        horizontalAlignment = Alignment.CenterHorizontally
+                                            .fillMaxWidth()
+                                            .padding(bottom = 24.dp),
+                                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = CBackground,
+                                        )
+
                                     ) {
 
 
-                                        Icon(
-                                            imageVector = Icons.Default.Add,
-                                            contentDescription = "PDF Summarizer",
-                                            modifier = Modifier.size(48.dp),
-                                            tint = MaterialTheme.colorScheme.primary
-                                        )
-                                        Spacer(modifier = Modifier.height(12.dp))
-                                        Text(
-                                            text = "PDF Summarizer",
-                                            style = MaterialTheme.typography.headlineMedium,
-                                            fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.primary
-                                        )
-                                        Text(
-                                            text = "Select a PDF file to generate an AI summary",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            textAlign = TextAlign.Center
-                                        )
-
-                                        // PDf Selection Button
-
-                                        Button(
-                                            onClick = {
-                                                pdfPickerLauncher.launch(arrayOf("application/pdf")) },
+                                        Column(
                                             modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(56.dp),
-                                            shape = RoundedCornerShape(12.dp)
+                                                .padding(20.dp)
+                                                .background(CBackground),
+                                            horizontalAlignment = Alignment.CenterHorizontally
                                         ) {
+
+
                                             Icon(
                                                 imageVector = Icons.Default.Add,
-                                                contentDescription = "Select PDF",
-                                                modifier = Modifier.size(24.dp)
+                                                contentDescription = "PDF Summarizer",
+                                                modifier = Modifier.size(48.dp),
+                                                tint = MaterialTheme.colorScheme.primary
                                             )
-                                            Spacer(modifier = Modifier.width(12.dp))
+                                            Spacer(modifier = Modifier.height(12.dp))
                                             Text(
-                                                text = if (selectedPdfUri != null) "Change PDF" else "Select PDF File",
-                                                fontSize = 16.sp,
-                                                fontWeight = FontWeight.Medium
+                                                text = "PDF Summarizer",
+                                                style = MaterialTheme.typography.headlineMedium,
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.primary
                                             )
-                                        }
+                                            Text(
+                                                text = "Select a PDF file to generate an AI summary",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                textAlign = TextAlign.Center
+                                            )
 
-                                        // PDF selected preview and info button
+                                            // PDf Selection Button
 
-                                        selectedPdfUri?.let {
-
-                                            Spacer(modifier = Modifier.height(24.dp))
-
-                                            Card(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                elevation = CardDefaults.cardElevation(
-                                                    defaultElevation = 2.dp
-                                                ),
-                                                colors = CardDefaults.cardColors(
-                                                    containerColor = CBackground
-                                                )
+                                            Button(
+                                                onClick = {
+                                                    pdfPickerLauncher.launch(arrayOf("application/pdf"))
+                                                },
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(56.dp),
+                                                shape = RoundedCornerShape(12.dp)
                                             ) {
-                                                Column(
-                                                    modifier = Modifier.padding(16.dp)
+                                                Icon(
+                                                    imageVector = Icons.Default.Add,
+                                                    contentDescription = "Select PDF",
+                                                    modifier = Modifier.size(24.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(12.dp))
+                                                Text(
+                                                    text = if (selectedPdfUri != null) "Change PDF" else "Select PDF File",
+                                                    fontSize = 16.sp,
+                                                    fontWeight = FontWeight.Medium
+                                                )
+                                            }
+                                            // TO check wether is there any uri form the home screen from recents
+                                            Log.d("URi", isURIpresent.value.toString())
+
+
+                                            selectedPdfUri?.let {
+
+
+                                                Spacer(modifier = Modifier.height(24.dp))
+
+                                                Card(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    elevation = CardDefaults.cardElevation(
+                                                        defaultElevation = 2.dp
+                                                    ),
+                                                    colors = CardDefaults.cardColors(
+                                                        containerColor = CBackground
+                                                    )
                                                 ) {
-
-
-                                                    // PDF name
-
-                                                    Row(
-                                                        modifier = Modifier.fillMaxWidth(),
-                                                        verticalAlignment = Alignment.CenterVertically
+                                                    Column(
+                                                        modifier = Modifier.padding(16.dp)
                                                     ) {
-                                                        Icon(
-                                                            imageVector = Icons.Default.Add,
-                                                            contentDescription = "PDF Icon",
-                                                            tint = Color(0xFFE53E3E),
-                                                            modifier = Modifier.size(24.dp)
-                                                        )
-                                                        Spacer(modifier = Modifier.width(12.dp))
-                                                        Column(modifier = Modifier.weight(1f)) {
-                                                            Text(
-                                                                text = "Selected PDF:",
-                                                                style = MaterialTheme.typography.bodySmall,
-                                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                                            )
-                                                            Text(
-                                                                text = pdfName.ifEmpty { "Unknown PDF" },
-                                                                style = MaterialTheme.typography.bodyLarge,
-                                                                fontWeight = FontWeight.Medium,
-                                                                maxLines = 2,
-                                                                overflow = TextOverflow.Ellipsis
-                                                            )
-                                                        }
-                                                    }
 
 
-                                                    // PDF Preview
+                                                        // PDF name
 
-                                                    pdfPreviewBitmap?.let { bitmap ->
-                                                        Spacer(modifier = Modifier.height(16.dp))
-                                                        Text(
-                                                            text = "Preview:",
-                                                            style = MaterialTheme.typography.bodySmall,
-                                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                                        )
-                                                        Spacer(modifier = Modifier.height(8.dp))
-
-                                                        Box(
-                                                            modifier = Modifier
-                                                                .fillMaxWidth()
-                                                                .height(200.dp)
-                                                                .clip(RoundedCornerShape(8.dp))
-                                                                .background(Color.Gray.copy(alpha = 0.1f)),
-                                                            contentAlignment = Alignment.Center
-                                                        ) {
-                                                            Image(
-                                                                bitmap = bitmap.asImageBitmap(),
-                                                                contentDescription = "PDF Preview",
-                                                                modifier = Modifier
-                                                                    .fillMaxSize()
-                                                                    .clip(RoundedCornerShape(8.dp)),
-                                                                contentScale = ContentScale.Fit
-                                                            )
-                                                        }
-
-                                                        Spacer(modifier = Modifier.height(16.dp))
-
-                                                        Button(
-                                                            onClick = {
-                                                                geminiViewModel.value.extractAndSummarize()
-                                                            },
+                                                        Row(
                                                             modifier = Modifier.fillMaxWidth(),
-                                                            enabled = !isLoading,
-                                                            shape = RoundedCornerShape(8.dp)
+                                                            verticalAlignment = Alignment.CenterVertically
                                                         ) {
-                                                            if (isLoading) {
-                                                                CircularProgressIndicator(
-                                                                    modifier = Modifier
-//                                                                        .background(CDotFocusedColor)
-                                                                        .size(20.dp),
-                                                                    strokeWidth = 2.dp,
-                                                                    color = CDotFocusedColor
+                                                            Icon(
+                                                                imageVector = Icons.Default.Add,
+                                                                contentDescription = "PDF Icon",
+                                                                tint = Color(0xFFE53E3E),
+                                                                modifier = Modifier.size(24.dp)
+                                                            )
+                                                            Spacer(modifier = Modifier.width(12.dp))
+                                                            Column(modifier = Modifier.weight(1f)) {
+                                                                Text(
+                                                                    text = "Selected PDF:",
+                                                                    style = MaterialTheme.typography.bodySmall,
+                                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                                                 )
-                                                                Spacer(modifier = Modifier.width(12.dp))
-                                                                Text("Generating Summary...")
-                                                            } else {
-                                                                Icon(
-                                                                    imageVector = Icons.Default.Add,
-                                                                    contentDescription = "Summarize",
-                                                                    modifier = Modifier.size(20.dp)
+                                                                Text(
+                                                                    text = pdfName.ifEmpty { "Unknown PDF" },
+                                                                    style = MaterialTheme.typography.bodyLarge,
+                                                                    fontWeight = FontWeight.Medium,
+                                                                    maxLines = 2,
+                                                                    overflow = TextOverflow.Ellipsis
                                                                 )
-                                                                Spacer(modifier = Modifier.width(12.dp))
-                                                                Text("Generate Summary")
                                                             }
                                                         }
 
 
+                                                        // PDF Preview
+
+                                                        pdfPreviewBitmap?.let { bitmap ->
+                                                            Spacer(modifier = Modifier.height(16.dp))
+                                                            Text(
+                                                                text = "Preview:",
+                                                                style = MaterialTheme.typography.bodySmall,
+                                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                            )
+                                                            Spacer(modifier = Modifier.height(8.dp))
+
+                                                            Box(
+                                                                modifier = Modifier
+                                                                    .fillMaxWidth()
+                                                                    .height(200.dp)
+                                                                    .clip(RoundedCornerShape(8.dp))
+                                                                    .background(
+                                                                        Color.Gray.copy(
+                                                                            alpha = 0.1f
+                                                                        )
+                                                                    ),
+                                                                contentAlignment = Alignment.Center
+                                                            ) {
+                                                                Image(
+                                                                    bitmap = bitmap.asImageBitmap(),
+                                                                    contentDescription = "PDF Preview",
+                                                                    modifier = Modifier
+                                                                        .fillMaxSize()
+                                                                        .clip(RoundedCornerShape(8.dp)),
+                                                                    contentScale = ContentScale.Fit
+                                                                )
+                                                            }
+
+                                                            Spacer(modifier = Modifier.height(16.dp))
+
+                                                            Button(
+                                                                onClick = {
+                                                                    geminiViewModel.value.extractAndSummarize()
+                                                                },
+                                                                modifier = Modifier.fillMaxWidth(),
+                                                                enabled = !isLoading,
+                                                                shape = RoundedCornerShape(8.dp)
+                                                            ) {
+                                                                if (isLoading) {
+                                                                    CircularProgressIndicator(
+                                                                        modifier = Modifier
+                                                                            .size(20.dp),
+                                                                        strokeWidth = 2.dp,
+                                                                        color = CDotFocusedColor
+                                                                    )
+                                                                    Spacer(
+                                                                        modifier = Modifier.width(
+                                                                            12.dp
+                                                                        )
+                                                                    )
+                                                                    Text("Generating Summary...")
+                                                                } else {
+                                                                    Icon(
+                                                                        imageVector = Icons.Default.Add,
+                                                                        contentDescription = "Summarize",
+                                                                        modifier = Modifier.size(20.dp)
+                                                                    )
+                                                                    Spacer(
+                                                                        modifier = Modifier.width(
+                                                                            12.dp
+                                                                        )
+                                                                    )
+                                                                    Text("Generate Summary")
+                                                                }
+                                                            }
+
+
+                                                        }
                                                     }
                                                 }
+
                                             }
+
 
                                         }
 
-
                                     }
-
                                 }
-
                             }
-                        }
-
-                        item {
+                            item {
 
 
-                            if (summaryResonse.value.toString()
-                                    .isNotEmpty() && summaryResonse.value.toString() != "null"
-                            ) {
-
-
-                                Spacer(modifier = Modifier.height(24.dp))
-
-                                Card(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(
-                                            alpha = 0.3f
-                                        )
-                                    )
+                                if (summaryResonse.value.toString()
+                                        .isNotEmpty() && summaryResonse.value.toString() != "null"
                                 ) {
-                                    Column(
-                                        modifier = Modifier.padding(16.dp)
+
+
+                                    Spacer(modifier = Modifier.height(24.dp))
+
+                                    Card(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(
+                                                alpha = 0.3f
+                                            )
+                                        )
                                     ) {
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically
+                                        Column(
+                                            modifier = Modifier.padding(16.dp)
                                         ) {
-                                            Icon(
-                                                imageVector = Icons.Default.Add,
-                                                contentDescription = "Summary",
-                                                tint = MaterialTheme.colorScheme.primary,
-                                                modifier = Modifier.size(24.dp)
-                                            )
-                                            Spacer(modifier = Modifier.width(12.dp))
-                                            Text(
-                                                text = "AI Summary",
-                                                fontFamily = FontFamily(Font(R.font.space_grotesk)),
-                                                fontWeight = FontWeight.ExtraBold,
-                                                color = CDotFocusedColor
-                                            )
-
-
-                                            Spacer(Modifier.padding(horizontal = 70.dp))
-
-                                            Button(
-                                                modifier = Modifier,
-                                                onClick = {
-                                                    if (summaryResonse.value.toString()
-                                                            .isNotEmpty()
-                                                    ) {
-                                                        val clipboardManager =
-                                                            context.getSystemService(
-                                                                Context.CLIPBOARD_SERVICE
-                                                            ) as ClipboardManager
-                                                        val clip =
-                                                            ClipData.newPlainText(
-                                                                "Summary",
-                                                                summaryResonse.value.toString()
-                                                            )
-                                                        clipboardManager.setPrimaryClip(clip)
-                                                        showCopySuccess = true
-                                                    }
-                                                },
-                                                colors = ButtonDefaults.buttonColors(
-                                                    containerColor = CDotUnFocusedColour.copy(0.4f)
-                                                )
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically
                                             ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Add,
+                                                    contentDescription = "Summary",
+                                                    tint = MaterialTheme.colorScheme.primary,
+                                                    modifier = Modifier.size(24.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(12.dp))
                                                 Text(
-                                                    if (showCopySuccess) "Copied!" else "Copy",
+                                                    text = "AI Summary",
+                                                    fontFamily = FontFamily(Font(R.font.space_grotesk)),
+                                                    fontWeight = FontWeight.ExtraBold,
                                                     color = CDotFocusedColor
                                                 )
-                                            }
 
-                                            if (showCopySuccess) {
-                                                LaunchedEffect(showCopySuccess) {
-                                                    delay(2000)
-                                                    showCopySuccess = false
+
+                                                Spacer(Modifier.padding(horizontal = 70.dp))
+
+                                                Button(
+                                                    modifier = Modifier,
+                                                    onClick = {
+                                                        if (summaryResonse.value.toString()
+                                                                .isNotEmpty()
+                                                        ) {
+                                                            val clipboardManager =
+                                                                context.getSystemService(
+                                                                    Context.CLIPBOARD_SERVICE
+                                                                ) as ClipboardManager
+                                                            val clip =
+                                                                ClipData.newPlainText(
+                                                                    "Summary",
+                                                                    summaryResonse.value.toString()
+                                                                )
+                                                            clipboardManager.setPrimaryClip(clip)
+                                                            showCopySuccess = true
+                                                        }
+                                                    },
+                                                    colors = ButtonDefaults.buttonColors(
+                                                        containerColor = CDotUnFocusedColour.copy(0.4f)
+                                                    )
+                                                ) {
+                                                    Text(
+                                                        if (showCopySuccess) "Copied!" else "Copy",
+                                                        color = CDotFocusedColor
+                                                    )
+                                                }
+
+                                                if (showCopySuccess) {
+                                                    LaunchedEffect(showCopySuccess) {
+                                                        delay(2000)
+                                                        showCopySuccess = false
+                                                    }
                                                 }
                                             }
+
+                                            Spacer(modifier = Modifier.height(12.dp))
+
+                                            Text(
+                                                text = summaryResonse.value.toString(),
+                                                color = White,
+                                                fontFamily = FontFamily(Font(R.font.space_grotesk)),
+                                                lineHeight = 24.sp
+                                            )
                                         }
-
-                                        Spacer(modifier = Modifier.height(12.dp))
-
-                                        Text(
-                                            text = summaryResonse.value.toString(),
-                                            color = White,
-                                            fontFamily = FontFamily(Font(R.font.space_grotesk)),
-                                            lineHeight = 24.sp
-                                        )
                                     }
-                                }
 
+                                }
                             }
+
                         }
 
                     }
 
+                }else{
+
+
+                    DirectUriPdfSummarizerScreen(
+                        pdfUri = isURIpresent.value!!.toUri(),
+                        geminiViewModel = geminiViewModel,
+                        onBackPressed = {
+                            finish()
+
+                        }
+                    )
                 }
+
+
             }
         }
     }

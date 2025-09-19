@@ -2,6 +2,7 @@ package com.example.aistudyplanner.NestedScreens
 
 import android.app.Application
 import android.content.Intent
+import android.util.Log
 import android.widget.Space
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -109,6 +110,7 @@ fun HomeScreen(
             }
     )
 
+    val recentPdf = remember { mutableStateOf<RecentsPdf?>(null) }
 
     Scaffold(
         modifier = Modifier
@@ -137,6 +139,7 @@ fun HomeScreen(
                 LaunchedEffect(Unit) {
 //                geminiViewModel.aiTipOfTheDay()
                     refreshButton.value = false
+
                 }
             }
             Row(
@@ -223,12 +226,15 @@ fun HomeScreen(
                                 onFileClick = { recentsPDF ->
                                     showBottomSheet = true
 
+
+
                                     recentsPDFs.value = recentsPDF
                                 },
                                 modifier = Modifier
                             )
 
                         }
+
 
                         val context = LocalContext.current
 
@@ -249,14 +255,14 @@ fun HomeScreen(
                                 ) {
 
                                     Text(
-                                        "What do you want to do with this file? ${recentsPDFs.value?.name.toString()}",
+                                        "What do you want to do with this file? ",
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
                                         fontFamily = FontFamily(Font(R.font.space_grotesk))
                                     )
 
                                     Text(
-                                        text =  recentsPDFs.value?.name.toString(),
+                                        text = recentsPDFs.value?.name.toString(),
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
                                         fontFamily = FontFamily(Font(R.font.space_grotesk)),
@@ -268,7 +274,7 @@ fun HomeScreen(
 
                                     RecentsCard(
                                         recentFile = RecentsPdf(
-                                            uri = "",
+                                            uri = recentsPDFs.value?.uri.toString(),
                                             name = "Summarize",
                                             openedAt = 343434L
                                         ),
@@ -276,9 +282,24 @@ fun HomeScreen(
                                             val intent = Intent(
                                                 context,
                                                 PdfSumScreen::class.java
-                                            )
+                                            ).apply {
+
+                                                putExtra(
+                                                    "URI_KEY",
+                                                    recentsPDFs.value?.uri.toString()
+                                                )
+                                            }
                                             context.startActivity(intent)
 
+
+                                            Log.d(
+                                                "URI", recentsPDFs
+                                                    .value?.uri.toString()
+                                            )
+                                            Log.d(
+                                                "URI Name", recentsPDFs
+                                                    .value?.name.toString()
+                                            )
                                         },
                                         modifier = Modifier,
                                         icon = R.drawable.summaryicon
@@ -288,7 +309,7 @@ fun HomeScreen(
 
                                     RecentsCard(
                                         recentFile = RecentsPdf(
-                                            uri = "",
+                                            uri = recentsPDFs.value?.uri.toString(),
                                             name = "Generate Quizz",
                                             openedAt = 343434L,
                                         ),
@@ -297,7 +318,13 @@ fun HomeScreen(
                                             val intent = Intent(
                                                 context,
                                                 QuizzScreen::class.java
-                                            )
+                                            ).apply {
+                                                putExtra(
+                                                    "URI_KEY",
+                                                    recentsPDFs.value?.uri.toString()
+                                                )
+
+                                            }
                                             context.startActivity(intent)
 
                                         },
