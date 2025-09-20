@@ -10,17 +10,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.aistudyplanner.Gemini.GeminiViewModel
 
 @Composable
-fun QuizzNavigation(backStack: NavBackStack,onBack: () -> Unit,application: Application) {
+fun QuizzNavigation(
+    backStack: NavBackStack,
+    onBack: () -> Unit,
+    application: Application,
+    uriKey: String? = null,
+) {
 
     var currentScreen by remember { mutableStateOf<QuizzRoutes>(QuizzRoutes.QmainScreen) }
     var selectedPdfUri by remember { mutableStateOf<Uri?>(null) }
@@ -45,14 +52,19 @@ fun QuizzNavigation(backStack: NavBackStack,onBack: () -> Unit,application: Appl
                 QuizzMainScreen(
                     onUploadPdf = { uri ->
 
-                        selectedPdfUri = uri
-                        geminiViewModel.setPDfquizz(uri)
-                        currentScreen = QuizzRoutes.QProcessingScreen
+                        selectedPdfUri = if (uriKey?.toUri() == null) uri else uriKey?.toUri()
+                        if (uriKey?.toUri() == null)
+
+                            geminiViewModel.setPDfquizz(uri)
+                        else
+                            geminiViewModel.setPDfquizz(uriKey.toUri())
+
                     }, isGenerating = isGeneratingQuiz, navBackState = backStack,
                     backButton = {
                         onBack.invoke()
                     },
-                    application
+                    application,
+                    uriKey = uriKey
 
                 )
             }
@@ -60,12 +72,11 @@ fun QuizzNavigation(backStack: NavBackStack,onBack: () -> Unit,application: Appl
 
             entry<QuizzRoutes.QProcessingScreen> {
                 ProcessingScreen(
-                    pdfUri = selectedPdfUri, onQuizGenerated = { quiz ->
-                        currentScreen = QuizzRoutes.QuizzPannel
-                        isGeneratingQuiz = false
-                    }, backStack
+                    pdfUri = selectedPdfUri,
+                    newUri = uriKey?.toUri(),
+                    navBackStack = backStack,
 
-                )
+                    )
             }
 
 

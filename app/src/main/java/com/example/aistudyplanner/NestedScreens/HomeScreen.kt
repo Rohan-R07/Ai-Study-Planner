@@ -109,6 +109,7 @@ fun HomeScreen(
                 }
             }
     )
+    geminiViewModel.aiTipOfTheDay() // has to commented after some time
 
     val recentPdf = remember { mutableStateOf<RecentsPdf?>(null) }
 
@@ -137,7 +138,7 @@ fun HomeScreen(
 
             if (refreshButton.value) {
                 LaunchedEffect(Unit) {
-//                geminiViewModel.aiTipOfTheDay()
+                geminiViewModel.aiTipOfTheDay()
                     refreshButton.value = false
 
                 }

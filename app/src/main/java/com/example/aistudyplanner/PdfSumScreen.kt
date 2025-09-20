@@ -526,7 +526,6 @@ class PdfSumScreen : ComponentActivity() {
                         geminiViewModel = geminiViewModel,
                         onBackPressed = {
                             finish()
-
                         }
                     )
                 }
