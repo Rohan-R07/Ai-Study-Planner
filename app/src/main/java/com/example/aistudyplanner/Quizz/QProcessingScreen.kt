@@ -48,41 +48,20 @@ import com.example.aistudyplanner.Gemini.GeminiViewModel
 import com.example.aistudyplanner.ui.theme.CDotFocusedColor
 import kotlinx.coroutines.delay
 
-val json =
-    """
-    [
-        {
-            "id": 1,
-            "name": "John Doe",
-            "title": "Software Engineer",
-            "age": 28
-        },
-        {
-            "id": 2,
-            "name": "Jane Smith",
-            "title": "Product Manager",
-            "age": 32
-        },
-        {
-            "id": 3,
-            "name": "Alex Johnson",
-            "title": "UI/UX Designer",
-            "age": 26
-        }
-    ]
-    """
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ProcessingScreen(
     pdfUri: Uri?,
-    onQuizGenerated: (Quiz) -> Unit,
+    newUri: Uri?,
     navBackStack: NavBackStack
 ) {
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
     ) { innerPadding ->
+
+        // TODo it is seacrhing with the pdfUrl from the Epandable Menu but i am using that Home recents menu
 
 
         val context = LocalContext.current
@@ -113,11 +92,14 @@ fun ProcessingScreen(
 
         val quizz = geminiViewModel.quizState.collectAsState()
 
-        Log.d("ExtractedTextingRohan", geminiViewModel.sucessfulyCreatedQuizz.collectAsState().value.toString())
+        Log.d(
+            "ExtractedTextingRohan",
+            geminiViewModel.sucessfulyCreatedQuizz.collectAsState().value.toString()
+        )
 
-        if (quizz.value?.title.toString() != "null" ) {
+        Log.d("RecentsQuizx", quizz.value?.title.toString())
 
-
+        if (quizz.value?.title.toString() != "null") {
 
 
             navBackStack.add(QuizzRoutes.QuizzPannel)
@@ -126,28 +108,48 @@ fun ProcessingScreen(
 
         }
 
-        Log.d("pdfURL",pdfUri.toString())
+        Log.d("pdfURL", pdfUri.toString())
 
         val context1 = LocalContext.current
 
         Log.d("ExtractedTexting", extractedTextFromPdfSucessfull.toString())
-        LaunchedEffect(pdfUri) {
-            if (pdfUri != null ) {
 
+        if (newUri == null) {
+            LaunchedEffect(pdfUri) {
+                if (pdfUri != null) {
+
+                    geminiViewModel.setPDfquizz(pdfUri)
+                    geminiViewModel.generateQuizz()
+
+
+                    // Simulate processing steps
+                    for (i in processingSteps.indices) {
+                        processingStep = i
+                        delay(1000) // Simulate processing time
+                    }
+                } else {
+                    Toast.makeText(context1, "Error in reading the pdf", Toast.LENGTH_LONG).show()
+                }
+                Log.d("ExtractedTexting", extractedTextFromPdfSucessfull.toString())
+            }
+
+
+        } else {
+            LaunchedEffect(newUri) {
+
+                geminiViewModel.setPDfquizz(newUri)
                 geminiViewModel.generateQuizz()
-
 
                 // Simulate processing steps
                 for (i in processingSteps.indices) {
                     processingStep = i
                     delay(1000) // Simulate processing time
                 }
+                Log.d("ExtractedTexting", extractedTextFromPdfSucessfull.toString())
             }
-            else{
-                Toast.makeText(context1,"Error in reading the pdf",Toast.LENGTH_LONG).show()
-            }
-            Log.d("ExtractedTexting", extractedTextFromPdfSucessfull.toString())
         }
+
+
 
         Column(
             modifier = Modifier
@@ -210,31 +212,10 @@ fun ProcessingScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-//                    ContainedLoadingIndicator(
-////                        polygons = listOf(
-////                            MaterialShapes.Pill,
-////                            MaterialShapes.Oval
-////                        ),
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .height(8.dp)
-//                            .clip(RoundedCornerShape(4.dp)),
-//                        color = Color(0xFF667eea),
-//                        progress = (processingStep + 1).toFloat() / processingSteps.size,
-//                        containerColor = TODO(),
-//                        indicatorColor = TODO(),
-//                        containerShape = TODO(),
-//                        polygons = TODO(),
-////                        containerColor = TODO(),
-////                        indicatorColor = TODO(),
-////                        containerShape = TODO()
-//                    )
-
-
-//
                     LinearProgressIndicator(
                         progress = (processingStep + 1).toFloat() / processingSteps.size,
                         modifier = Modifier
+                            .fillMaxWidth()
                             .fillMaxWidth()
                             .height(8.dp)
                             .clip(RoundedCornerShape(4.dp)),
@@ -257,8 +238,6 @@ fun ProcessingScreen(
             }
         }
     }
-
-
 
 
 }

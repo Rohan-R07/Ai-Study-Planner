@@ -53,6 +53,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -86,6 +87,9 @@ class QuizzScreen : ComponentActivity() {
             }
         )
 
+        val value = intent.getStringExtra("URI_KEY") // Replace with the appropriate type
+
+
         enableEdgeToEdge()
         setContent {
             AIStudyPlannerTheme {
@@ -96,7 +100,9 @@ class QuizzScreen : ComponentActivity() {
                     onBack = {
                         finish()
                     },
-                    application
+                    application,
+                    uriKey = value
+
                 )
 
             }
