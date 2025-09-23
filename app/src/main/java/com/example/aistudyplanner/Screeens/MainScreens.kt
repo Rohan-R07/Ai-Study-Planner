@@ -3,8 +3,11 @@ package com.example.aistudyplanner.Screeens
 import android.app.Application
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -20,10 +23,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.rememberNavBackStack
 import com.example.aistudyplanner.BottomNavigation.BRoutes
 import com.example.aistudyplanner.BottomNavigation.BotttomNavGrpah
@@ -42,11 +47,13 @@ import com.example.aistudyplanner.ui.theme.CBackground
 import com.example.aistudyplanner.ui.theme.CDotFocusedColor
 import kotlin.jvm.java
 
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreens(
     geminiViewModel: GeminiViewModel,
-    application: Application
+    application: Application,
+    mainBackstack: NavBackStack
 ) {
 
     val bottomNavBackStack = rememberNavBackStack<BRoutes>(BRoutes.HomeScreen)
@@ -65,6 +72,9 @@ fun MainScreens(
 
 
     Scaffold(
+
+        modifier = Modifier
+            .fillMaxSize(),
         floatingActionButton = {
 
             ExpandableFloatingActionButton(
@@ -88,6 +98,7 @@ fun MainScreens(
 
                 )
         },
+        containerColor = CBackground,
 
         bottomBar = {
 
@@ -133,14 +144,15 @@ fun MainScreens(
             }
 
 
-        }
+        },
     ) { innerpadding ->
 
         BotttomNavGrpah(
             bbackstack = bottomNavBackStack,
             application = application,
             geminiViewModel = geminiViewModel,
-            innerPadding = innerpadding
+            innerPadding = innerpadding,
+            mainBackStack = mainBackstack
         )
     }
 }

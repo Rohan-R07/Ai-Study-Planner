@@ -31,7 +31,6 @@ class FirebaseAuthViewModel(context: Context) : ViewModel() {
     // State for loading and login success
      val _isLoading = MutableStateFlow(true)
 
-
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     suspend fun signInWithGoogle(): Boolean {
         _isLoading.value = true

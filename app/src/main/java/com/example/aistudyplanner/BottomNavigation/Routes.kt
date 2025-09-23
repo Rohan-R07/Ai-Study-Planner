@@ -11,8 +11,6 @@ interface BRoutes : NavKey{
     @Serializable
     data object ProfileScreen: BRoutes
 
-    @Serializable
-    data object SettingsScreen: BRoutes
 
 
 

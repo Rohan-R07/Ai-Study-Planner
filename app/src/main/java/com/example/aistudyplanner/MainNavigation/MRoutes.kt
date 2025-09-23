@@ -14,4 +14,7 @@ interface MRoutes : NavKey {
     @Serializable
     data object MainScreen : MRoutes
 
+    @Serializable
+    data object SettingsScreen : MRoutes
+
 }
