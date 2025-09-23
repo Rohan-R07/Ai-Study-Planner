@@ -24,6 +24,6 @@ val bottomNavBarItems = listOf(
     BottomNavBarItems(
         icon = Icons.Default.Person,
         title = "Profile",
-        navRoute = BRoutes.SettingsScreen
+        navRoute = BRoutes.ProfileScreen
     ),
 )
