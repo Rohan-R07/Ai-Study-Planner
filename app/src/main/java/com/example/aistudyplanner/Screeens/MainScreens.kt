@@ -82,15 +82,13 @@ fun MainScreens(
                     FabAction(painterResource(R.drawable.youtube_icon), "Summarize from Youtube") {
                         context.startActivity(ytIntent)
                     },
+
                     FabAction(painterResource(R.drawable.pdf_image), "Summarize with PDFs") {
-
                         context.startActivity(pdfIntent)
-
                     },
+
                     FabAction(painterResource(R.drawable.quizz_icon), "Create an Ai Quizz") {
-
                         context.startActivity(quizzIntent)
-
                     }
                 ),
                 fabColor = CDotFocusedColor,
@@ -145,6 +143,7 @@ fun MainScreens(
 
 
         },
+
     ) { innerpadding ->
 
         BotttomNavGrpah(

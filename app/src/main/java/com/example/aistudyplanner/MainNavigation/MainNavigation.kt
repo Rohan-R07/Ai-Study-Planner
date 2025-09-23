@@ -2,7 +2,9 @@ package com.example.aistudyplanner.MainNavigation
 
 import android.app.Application
 import android.content.Context
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -27,6 +29,7 @@ import com.example.aistudyplanner.OnBoarding.HorizontalPagerWithSmoothDots
 import com.example.aistudyplanner.Screeens.MainScreens
 import com.example.aistudyplanner.Screeens.SplashScreen
 
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
 fun MainNavigation(
     mainNavbackStack: NavBackStack,
@@ -46,9 +49,8 @@ fun MainNavigation(
             if (current is MRoutes.SettingsScreen) {
                 mainNavbackStack.add(MRoutes.MainScreen)
             } else {
-//                mainNavbackStack.lastOrNull()
-            }
 
+            }
         },
         entryDecorators = listOf(
             // Add the default decorators for managing scenes and saving state
@@ -85,7 +87,6 @@ fun MainNavigation(
                 )
             }
 
-
             entry<MRoutes.MainScreen> {
 
                 MainScreens(
@@ -95,12 +96,9 @@ fun MainNavigation(
                 )
             }
 
-
-
             entry<MRoutes.SettingsScreen> {
                 SettingsScreen(
-                    onBackPressed = { },
-                    onSignOut = {}
+                    mainBackStack = mainNavbackStack
                 )
             }
         }
