@@ -23,12 +23,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -122,12 +126,16 @@ fun SettingsScreen(
             // Preferences Section
             item {
                 SettingsSection(title = "Preferences") {
+
                     // Dark Mode Toggle
+
                     SettingsToggleItem(
+
                         icon = if (isDarkMode)
                             painterResource(R.drawable.dark_mode)
                         else
                             painterResource(R.drawable.light_mode),
+
                         title = "Dark Mode",
                         subtitle = if (isDarkMode) "Dark theme enabled" else "Light theme enabled",
                         isChecked = isDarkMode,
@@ -146,10 +154,11 @@ fun SettingsScreen(
             }
 
             // Quiz Settings Section (Hardcoded)
+
             item {
                 SettingsSection(title = "Quiz Settings") {
                     SettingsClickableItem(
-                        icon = Icons.Default.AddCircle,
+                        icon = Icons.Default.DateRange,
                         title = "Difficulty Level",
                         subtitle = "Medium",
                         onClick = { /* Hardcoded */ },
@@ -157,7 +166,7 @@ fun SettingsScreen(
                     )
 
                     SettingsClickableItem(
-                        icon = Icons.Default.Add,
+                        icon = Icons.Default.AddCircle,
                         title = "Default Questions",
                         subtitle = "10 questions",
                         onClick = { /* Hardcoded */ },
@@ -167,33 +176,32 @@ fun SettingsScreen(
             }
 
             // Advanced & About Section (Hardcoded)
+
             item {
                 SettingsSection(title = "Advanced & About") {
                     SettingsClickableItem(
-                        icon = Icons.Default.Add,
+                        icon = Icons.Default.Info,
                         title = "App Version",
-                        subtitle = "1.2.3 (Build 45)",
-                        onClick = { /* Hardcoded */ },
+                        subtitle = "1.0.0 (Build 45)",
+                        onClick = {},
                         extendedDrop = false
                     )
 
                     SettingsClickableItem(
-                        icon = Icons.Default.Add,
-                        title = "Feedback",
+                        icon = Icons.AutoMirrored.Default.Send,
+                        title = "Buggy",
                         subtitle = "Report bugs or suggest features",
-                        onClick = { /* Hardcoded */ },
+                        onClick = {},
                         extendedDrop = false
                     )
 
                     SettingsClickableItem(
-                        icon = Icons.Default.Add,
+                        icon = Icons.Default.Build,
                         title = "Open Source",
                         subtitle = "Licenses and attributions",
-                        onClick = { /* Hardcoded */ },
+                        onClick = {},
                         extendedDrop = false
                     )
-
-
                 }
             }
 
@@ -214,7 +222,6 @@ fun SettingsScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
 
-
                         Button(
                             onClick = { showSignOutDialog = true },
                             colors = ButtonDefaults.buttonColors(
@@ -231,6 +238,7 @@ fun SettingsScreen(
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("Sign Out")
                         }
+
                     }
                 }
             }
