@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
 
     alias(libs.plugins.jetbrains.kotlin.serialization)
+    alias(libs.plugins.google.firebase.crashlytics)
 
 }
 
@@ -61,6 +62,7 @@ dependencies {
     implementation(libs.googleid)
     implementation(libs.lifecycle.viewmodel.navigation3)
     implementation(libs.material)
+    implementation(libs.firebase.crashlytics)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
