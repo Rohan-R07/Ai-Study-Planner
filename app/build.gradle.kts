@@ -3,6 +3,10 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
+
+    alias(libs.plugins.jetbrains.kotlin.serialization)
+    alias(libs.plugins.google.firebase.crashlytics)
+
 }
 
 android {
@@ -52,6 +56,13 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.firebase.ai)
     implementation(libs.firebase.appcheck.debug)
+    implementation(libs.firebase.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
+    implementation(libs.lifecycle.viewmodel.navigation3)
+    implementation(libs.material)
+    implementation(libs.firebase.crashlytics)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -61,5 +72,49 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
 
+    implementation(libs.androidx.foundation)
+    implementation(libs.material3)
+
+
+// For lifecycleScope in Activity and Fragment
+    implementation(libs.androidx.lifecycle.runtime.ktx.v280)
+// or latest
+// (Optional) ViewModel & LiveData if you're using them
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+
+    implementation(libs.androidx.lifecycle.viewmodel.ktx.v292)
+// or latestimplementation(libs.kotlinx.serialization.core)
+//  implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.navigation3.runtime.v100alpha07)
+    implementation(libs.androidx.navigation3.ui.v100alpha07)
+
+    implementation(libs.kotlinx.serialization.core)
+    implementation(libs.kotlinx.serialization.json)
+
+
+    implementation(libs.lottie.compose) // Latest stable
+
+    implementation(libs.androidx.material.icons.core)
+
+
+    implementation(libs.androidx.material3.v140alpha14)
+
+    // transcribe
+
+    implementation(libs.okhttp)
+    implementation(libs.json)
+    implementation(libs.jsoup)
+
+    implementation(libs.tom.roush.pdfbox.android)
+
+    implementation(libs.androidx.datastore.preferences)
+
+    implementation(libs.coil.compose)
+
+
+    implementation(libs.androidx.material3.v140alpha14)
+
+    implementation(libs.material3)
 
 }
