@@ -20,6 +20,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.aistudyplanner.Gemini.GeminiViewModel
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 @Composable
 fun QuizzNavigation(
@@ -41,16 +42,23 @@ fun QuizzNavigation(
     }
 
     )
+
+
+    val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
+
     NavDisplay(
         backStack = backStack, onBack = {
             backStack.removeLastOrNull()
         }, modifier = Modifier.fillMaxSize(),
 
         entryProvider = entryProvider {
-
+            firebaseCrashlytics.log("")
             entry<QuizzRoutes.QmainScreen> {
+                firebaseCrashlytics.log("Currently inside of Quizz Screen")
                 QuizzMainScreen(
                     onUploadPdf = { uri ->
+
+                        firebaseCrashlytics.log("Uploading URI from recents to the pdf ")
 
                         selectedPdfUri = if (uriKey?.toUri() == null) uri else uriKey?.toUri()
                         if (uriKey?.toUri() == null)
@@ -71,6 +79,7 @@ fun QuizzNavigation(
 
 
             entry<QuizzRoutes.QProcessingScreen> {
+                firebaseCrashlytics.log("Currently inside of QProcessing Screen")
                 ProcessingScreen(
                     pdfUri = selectedPdfUri,
                     newUri = uriKey?.toUri(),
@@ -81,7 +90,7 @@ fun QuizzNavigation(
 
 
             entry<QuizzRoutes.QuizzPannel> {
-//                currentQuiz?.let { quiz ->
+                firebaseCrashlytics.log("Currently insider of quizz pannel")
                 QuizzPannel(navBackStackEntry = backStack, exitQuizz = {
                     onBack.invoke()
                 })

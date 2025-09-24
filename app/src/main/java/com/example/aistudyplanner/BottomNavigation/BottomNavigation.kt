@@ -22,6 +22,7 @@ import com.example.aistudyplanner.Gemini.GeminiViewModel
 import com.example.aistudyplanner.NestedScreens.HomeScreen
 import com.example.aistudyplanner.NestedScreens.ProfileScreen
 import com.example.aistudyplanner.MainNavigation.SettingsScreen
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 
 @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
@@ -33,6 +34,8 @@ fun BotttomNavGrpah(
     innerPadding: PaddingValues,
     mainBackStack: NavBackStack
 ) {
+
+    val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
 
 
     NavDisplay(
@@ -56,6 +59,7 @@ fun BotttomNavGrpah(
             // Slide in from left when navigating back
             slideInHorizontally(initialOffsetX = { -it }) togetherWith
                     slideOutHorizontally(targetOffsetX = { it })
+
         },
         predictivePopTransitionSpec = {
             // Slide in from left when navigating back
@@ -65,11 +69,15 @@ fun BotttomNavGrpah(
         entryProvider = entryProvider {
 
             entry<BRoutes.HomeScreen> {
+                firebaseCrashlytics.log("Home Screen Triggred")
+
                 HomeScreen(bbackstack, geminiViewModel = geminiViewModel, application)
             }
 
 
             entry<BRoutes.ProfileScreen> {
+                firebaseCrashlytics.log("ProfileScreen triggred")
+
                 ProfileScreen(
                     onBackPressed = {},
                     onSettingsClicked = {},

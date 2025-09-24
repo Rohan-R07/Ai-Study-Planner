@@ -12,6 +12,7 @@ import com.example.aistudyplanner.Quizz.QuizState
 import com.google.firebase.Firebase
 import com.google.firebase.ai.ai
 import com.google.firebase.ai.type.GenerativeBackend
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
 import kotlinx.coroutines.Dispatchers
@@ -94,7 +95,7 @@ class GeminiViewModel(
     fun YTSummaries(url: String) {
         youtubeSummaryisLoading.value = true
         youtubeSummaryError.value = false
-
+        firebaseCrashlytics.log("starting with youtube summarization")
         try {
 
             viewModelScope.launch {
@@ -109,18 +110,26 @@ class GeminiViewModel(
 
                 if (aiResponse.text.toString().isNotEmpty()) {
                     youtubeSummaryisLoading.value = false
+                    firebaseCrashlytics.log("youtube summarization Sucessfull")
 
                 } else {
                     youtubeSummaryisLoading.value = true
+
+                    firebaseCrashlytics.log("youtube summarization Failed")
+
                 }
             }
         } catch (e: Exception) {
             youtubeSummaryError.value = true
             tipLoading.value = true
+
+            firebaseCrashlytics.log("An error occured while Summarizing with youtube Link $e")
+
         }
     }
 
 
+    val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
     private val _selectedPdfUri = MutableStateFlow<Uri?>(null)
     val selectedPdfUri: StateFlow<Uri?> = _selectedPdfUri
 
@@ -132,6 +141,8 @@ class GeminiViewModel(
 
     fun setPdfUri(uri: Uri) {
         _selectedPdfUri.value = uri
+        firebaseCrashlytics.log("Setting pdf for summarization")
+
     }
 
     val isLoadingPdfSummary = MutableStateFlow<Boolean>(false)
@@ -139,10 +150,15 @@ class GeminiViewModel(
     private val isExtractionSucesfull = MutableStateFlow<Boolean>(false)
 
     fun extractAndSummarize() {
+
+        firebaseCrashlytics.log("Extracting and summarixation started with the pdf")
+
         isLoadingPdfSummary.value = true
         viewModelScope.launch(Dispatchers.IO) {
             val uri = _selectedPdfUri.value ?: return@launch
             try {
+
+
                 appContext.contentResolver.openInputStream(uri)?.use { inputStream ->
                     val pdfDoc = PDDocument.load(inputStream)
                     val stripper = PDFTextStripper()
@@ -152,8 +168,12 @@ class GeminiViewModel(
                     Log.d("Extracted", text.toString())
 
                     if (text.isNotEmpty()) {
+                        firebaseCrashlytics.log("Extracting and summarixation Sucessfull")
                         isExtractionSucesfull.value = true
                     } else {
+
+                        firebaseCrashlytics.log("Extracting and summarixation Failed")
+
                         isExtractionSucesfull.value = false
                     }
 
@@ -163,6 +183,8 @@ class GeminiViewModel(
 
                 isExtractionSucesfull.value = false
 
+                firebaseCrashlytics.log("Error occured while extracting and summarixing from pdf $e")
+
             }
 
 
@@ -171,12 +193,16 @@ class GeminiViewModel(
                 viewModelScope.launch(Dispatchers.IO) {
                     val text = _extractedText.value ?: return@launch
                     try {
+                firebaseCrashlytics.log("Extraction from the PDF for summarizatoin is sucessfull")
                         val prompt = "Summaizw this pdf content $text"
 
                         val response = model.generateContent(prompt)
                         _summary.value = response.text.toString()
                         isLoadingPdfSummary.value = false
                     } catch (e: Exception) {
+
+                        firebaseCrashlytics.log("Extraction from the PDF for summarizatoin is Failed $e")
+
                         _summary.value = "Failed to summarize: ${e.message}"
                         isLoadingPdfSummary.value = true
                     }
@@ -210,6 +236,7 @@ class GeminiViewModel(
 //    val quizState: StateFlow<QuizState> = _quizState
     fun setPDfquizz(uri: Uri) {
         pdfSetingQuizz.value = uri
+        firebaseCrashlytics.log("Setting PDF uri for Quizz Generation")
     }
 
     val creatingQuizzs = MutableStateFlow<Boolean>(false)
@@ -217,6 +244,7 @@ class GeminiViewModel(
     @SuppressLint("SuspiciousIndentation")
     fun generateQuizz() {
 
+        firebaseCrashlytics.log("Starting With Quizz Generation")
 
         extractingFromPdfQuizSucessfull.value = true
         _isLoadingQuizz.value = true // becomes false just after quizz sucessfulll created
@@ -230,6 +258,9 @@ class GeminiViewModel(
             val uri = pdfSetingQuizz.value ?: return@launch
 
             try {
+                firebaseCrashlytics.log("sucessfully Extracted for quizz")
+
+
                 appContext.contentResolver.openInputStream(uri)?.use { inputStream ->
                     val pdfDoc = PDDocument.load(inputStream)
                     val stripper = PDFTextStripper()
@@ -248,6 +279,7 @@ class GeminiViewModel(
                         extractingTextFromPdfQuizz.value = text
                         extractingFromPdfQuizSucessfull.value = true
                         creatingQuizzs.value = false
+                        firebaseCrashlytics.log("sucessfully Extracted for quizz")
 
 
                         val prompt = """
@@ -276,18 +308,20 @@ class GeminiViewModel(
                         try {
                             val aiResponse = model.generateContent(prompt)
 
+                            firebaseCrashlytics.log("Passing Extracted Text for Gemini API")
+
 //                            Log.d("Quizzinghere brother",aiResponse.text.toString()   )
 
-                                Log.d("Quizzinghere", aiResponse.text.toString())
+                            Log.d("Quizzinghere", aiResponse.text.toString())
 
                             if (aiResponse.text?.isNotEmpty()!!) {
                                 creatingQuizzs.value = true
 
+                                firebaseCrashlytics.log("Sucessfully generated Quizz")
+
                                 loadQuizFromJson(aiResponse.text.toString())
-
-
                             } else creatingQuizzs.value = false
-
+                            firebaseCrashlytics.log("Failed to generated quizz")
 //                            val quiz = parseQuizJson(json)
 
 //                            withContext(Dispatchers.Main) {
@@ -298,7 +332,7 @@ class GeminiViewModel(
 
                         } catch (e: Exception) {
                             creatingQuizzs.value = false
-
+                            firebaseCrashlytics.log("Failed to generaed with error code $e")
                         }
 
                         creatingQuizzs.value = false
@@ -306,9 +340,8 @@ class GeminiViewModel(
                     } else {
                     }
                 }
-
             } catch (e: Exception) {
-
+                firebaseCrashlytics.log("Failed to extract text from the pdf with error code $e")
             }
 
 
@@ -325,8 +358,14 @@ class GeminiViewModel(
 
     fun loadQuizFromJson(rawJson: String) {
         viewModelScope.launch(Dispatchers.IO) {
+
+            firebaseCrashlytics.log("Started Loading parsing json from the response")
+
             sucessfulyCreatedQuizz.value = false
             try {
+
+                firebaseCrashlytics.log("Sucessfully stored json inside of variable with parse JSON methord")
+
                 val cleaned = sanitizeJson(rawJson)
                 Log.d("QuizViewModel", "Cleaned JSON: ${cleaned.take(200)}")
 
@@ -365,6 +404,9 @@ class GeminiViewModel(
                 _errorJson.value = null
                 Log.d("QuizViewModel", "Parsed ${questionsList.size} questions")
             } catch (e: Exception) {
+
+                firebaseCrashlytics.log("Failed to stored json inside of variable with parse JSON methord")
+
                 Log.e("QuizViewModel", "Failed to parse JSON", e)
                 _errorJson.value = "Failed to parse quiz: ${e.message}"
                 _quizState.value = null
@@ -374,6 +416,9 @@ class GeminiViewModel(
     }
 
     private fun sanitizeJson(raw: String): String {
+
+        firebaseCrashlytics.log("Small helper fucntion for converting JSON into Variable")
+
         var s = raw.trim()
         s = s.replace("```json", "", ignoreCase = true)
             .replace("```", "")

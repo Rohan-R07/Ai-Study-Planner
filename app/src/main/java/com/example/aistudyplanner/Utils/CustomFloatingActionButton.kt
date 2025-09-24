@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color.Companion.Unspecified
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.painter.Painter
 import com.example.aistudyplanner.ui.theme.CDotFocusedColor
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 
 data class FabAction(
@@ -48,6 +49,8 @@ fun ExpandableFloatingActionButton(
         label = "fab_rotation"
     )
 
+    val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
+
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.End,
@@ -72,6 +75,7 @@ fun ExpandableFloatingActionButton(
                 horizontalAlignment = Alignment.End
             ) {
                 fabActions.forEach { action ->
+                    firebaseCrashlytics.log("Triggring Custom Floating action button")
                     FabActionRow(
                         action = action,
                         showLabel = showLabels
@@ -150,57 +154,4 @@ private fun FabActionRow(
     }
 }
 
-//
-//@Composable
-//private fun ContentScreen(
-//    title: String,
-//    description: String
-//) {
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(16.dp),
-//        verticalArrangement = Arrangement.Top
-//    ) {
-//        Text(
-//            text = title,
-//            style = MaterialTheme.typography.headlineMedium,
-//            color = MaterialTheme.colorScheme.primary,
-//            modifier = Modifier.padding(bottom = 16.dp)
-//        )
-//
-//        Text(
-//            text = description,
-//            style = MaterialTheme.typography.bodyLarge,
-//            modifier = Modifier.padding(bottom = 24.dp)
-//        )
-//
-//        // Sample content
-//        LazyColumn(
-//            verticalArrangement = Arrangement.spacedBy(12.dp),
-//            contentPadding = PaddingValues(bottom = 120.dp) // Space for bottom nav + fab
-//        ) {
-//            items(20) { index ->
-//                Card(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-//                ) {
-//                    Column(
-//                        modifier = Modifier.padding(16.dp)
-//                    ) {
-//                        Text(
-//                            text = "$title Item ${index + 1}",
-//                            style = MaterialTheme.typography.titleMedium,
-//                            modifier = Modifier.padding(bottom = 4.dp)
-//                        )
-//                        Text(
-//                            text = "This is some sample content for $title screen. Item number ${index + 1}.",
-//                            style = MaterialTheme.typography.bodyMedium,
-//                            color = MaterialTheme.colorScheme.onSurfaceVariant
-//                        )
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
+

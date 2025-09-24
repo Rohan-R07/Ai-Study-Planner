@@ -4,12 +4,17 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.use
 
 fun getPdfFileName(context: Context, uri: Uri): String {
+    val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
+
+    firebaseCrashlytics.log("helper function in order to get pdf name and preview")
     return try {
+
         context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
             val nameIndex = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
             cursor.moveToFirst()

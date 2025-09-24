@@ -68,6 +68,7 @@ import com.example.aistudyplanner.ui.theme.AIStudyPlannerTheme
 import com.example.aistudyplanner.ui.theme.CBackground
 import com.example.aistudyplanner.ui.theme.CDotFocusedColor
 import com.google.firebase.ai.type.content
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.launch
 
 class QuizzScreen : ComponentActivity() {
@@ -76,6 +77,9 @@ class QuizzScreen : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val firebaseCrashlyics = FirebaseCrashlytics.getInstance()
+
+        firebaseCrashlyics.log("inside of QuizzScreen")
 
         val recentsvViewModel = viewModels<RecentsDataStoreVM>(
             factoryProducer = {

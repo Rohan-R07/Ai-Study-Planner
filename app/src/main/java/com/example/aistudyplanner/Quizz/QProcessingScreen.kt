@@ -46,6 +46,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavBackStack
 import com.example.aistudyplanner.Gemini.GeminiViewModel
 import com.example.aistudyplanner.ui.theme.CDotFocusedColor
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.delay
 
 
@@ -63,6 +64,7 @@ fun ProcessingScreen(
 
         // TODo it is seacrhing with the pdfUrl from the Epandable Menu but i am using that Home recents menu
 
+        val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
 
         val context = LocalContext.current
 
@@ -73,8 +75,8 @@ fun ProcessingScreen(
                         return GeminiViewModel(context) as T
                     }
                 }
-
         )
+
         var processingStep by remember { mutableStateOf(0) }
         val processingSteps = listOf(
             "Reading PDF content...",
@@ -113,11 +115,12 @@ fun ProcessingScreen(
         val context1 = LocalContext.current
 
         Log.d("ExtractedTexting", extractedTextFromPdfSucessfull.toString())
-
+        firebaseCrashlytics.log("Checkoing wether new uri is null or not ")
         if (newUri == null) {
+            firebaseCrashlytics.log("new uril us null ")
             LaunchedEffect(pdfUri) {
                 if (pdfUri != null) {
-
+                    firebaseCrashlytics.log("pdf uri is not null ")
                     geminiViewModel.setPDfquizz(pdfUri)
                     geminiViewModel.generateQuizz()
 
@@ -128,14 +131,20 @@ fun ProcessingScreen(
                         delay(1000) // Simulate processing time
                     }
                 } else {
+                    firebaseCrashlytics.log("pdf uri is null")
+
                     Toast.makeText(context1, "Error in reading the pdf", Toast.LENGTH_LONG).show()
                 }
+
                 Log.d("ExtractedTexting", extractedTextFromPdfSucessfull.toString())
             }
 
 
         } else {
             LaunchedEffect(newUri) {
+
+                firebaseCrashlytics.log("new uri is not null")
+
 
                 geminiViewModel.setPDfquizz(newUri)
                 geminiViewModel.generateQuizz()
@@ -228,6 +237,8 @@ fun ProcessingScreen(
 
             TextButton(
                 onClick = {
+                    firebaseCrashlytics.log("removing QProcesing screen")
+
                     navBackStack.remove(QuizzRoutes.QProcessingScreen)
                 },
                 colors = ButtonDefaults.textButtonColors(
@@ -240,14 +251,4 @@ fun ProcessingScreen(
     }
 
 
-}
-
-fun calculateScore(questions: List<Question>, selectedAnswers: Map<Int, Int>): Int {
-    var correct = 0
-    questions.forEachIndexed { index, question ->
-        if (selectedAnswers[index] == question.correctAnswer) {
-            correct++
-        }
-    }
-    return (correct * 100 / questions.size)
 }

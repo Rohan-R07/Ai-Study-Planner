@@ -25,11 +25,14 @@ import androidx.compose.ui.unit.sp
 import com.example.aistudyplanner.R
 import com.example.aistudyplanner.Utils.SwipeButton
 import com.example.aistudyplanner.ui.theme.CDotFocusedColor
+import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 @Composable
 fun OnBoardingScreen2(pageState: PagerState, page: Int) {
 
-
+    val firebaseCrashlyics = FirebaseCrashlytics.getInstance()
+    firebaseCrashlyics.log("Insider of OnBoardingScreen 2")
     Column(
         modifier = Modifier
             .fillMaxSize(),

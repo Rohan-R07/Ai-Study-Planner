@@ -74,6 +74,7 @@ import androidx.navigation3.runtime.NavBackStack
 import com.example.aistudyplanner.FirebaseAuth.FirebaseAuthViewModel
 import com.example.aistudyplanner.R
 import com.example.aistudyplanner.ui.theme.CBackground
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,6 +90,8 @@ fun SettingsScreen(
             }
         }
     )
+
+    val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
 
     // State for functional items
     var isDarkMode by remember { mutableStateOf(false) }
@@ -223,7 +226,10 @@ fun SettingsScreen(
                     ) {
 
                         Button(
-                            onClick = { showSignOutDialog = true },
+                            onClick = {
+                                firebaseCrashlytics.log("Showing Signin out dialog")
+                                showSignOutDialog = true
+                                      },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFFFF6B6B)
                             ),

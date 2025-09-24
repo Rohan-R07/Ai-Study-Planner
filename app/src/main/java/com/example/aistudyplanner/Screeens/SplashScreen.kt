@@ -26,6 +26,7 @@ import androidx.navigation3.runtime.NavBackStack
 import com.example.aistudyplanner.FirebaseAuth.FirebaseAuthViewModel
 import com.example.aistudyplanner.MainNavigation.MRoutes
 import com.example.aistudyplanner.ui.theme.CBackground
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.delay
 
 
@@ -34,6 +35,9 @@ fun SplashScreen(
     mainBackStack: NavBackStack,
     firebaseAuthViewModel: FirebaseAuthViewModel
 ) {
+
+    val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
+
     val scale = remember { Animatable(0.8f) }
     val alpha = remember { Animatable(0f) }
 
@@ -52,9 +56,11 @@ fun SplashScreen(
 
         // Navigation logic
         if (firebaseAuthViewModel.currentUser != null) {
+            firebaseCrashlytics.log("Current user not null so Navigating")
             mainBackStack.removeAll { true }
             mainBackStack.add(MRoutes.MainScreen)
         } else {
+            firebaseCrashlytics.log("Current user is null so not Navigating")
             mainBackStack.removeAll { true }
             mainBackStack.add(MRoutes.OnBoardingScreen)
         }
@@ -69,13 +75,6 @@ fun SplashScreen(
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             // Replace with a neon-inspired Lottie animation
-//            LottieAnimation(
-//                composition = rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.)).value,
-//                iterations = LottieConstants.IterateForever,
-//                modifier = Modifier
-//                    .size(200.dp)
-//                    .scale(scale.value)
-//            )
 
             Spacer(modifier = Modifier.height(24.dp))
 

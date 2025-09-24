@@ -23,34 +23,16 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.aistudyplanner.Quizz.firebaseCrashlyics
 import com.example.aistudyplanner.R
-
-//@Composable
-//fun SwipeText() {
-//    val colors = listOf(Color(0xFF6C63FF), Color(0xFFFF6B6B), Color(0xFF00C896))
-//    val infiniteTransition = rememberInfiniteTransition(label = "")
-//    val colorIndex = infiniteTransition.animateValue(
-//        initialValue = 0,
-//        targetValue = colors.size - 1,
-//        typeConverter = Int.VectorConverter,
-//        animationSpec = infiniteRepeatable(
-//            animation = tween(durationMillis = 1000, easing = LinearEasing),
-//            repeatMode = RepeatMode.Reverse
-//        ), label = ""
-//    )
-//
-//    Text(
-//        text = "Swipe →",
-//        color = colors[colorIndex.value],
-//        fontSize = 20.sp,
-//        fontWeight = FontWeight.Bold,
-//        fontFamily = FontFamily(Font(R.font.space_grotesk))
-//    )
-//}
-
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 @Composable
 fun SwipeButton() {
+    val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
+
+    firebaseCrashlytics.log("Swiping screen")
+
     val colors = listOf(
         Color(0xFFFF6B6B), // Bright Coral Red
         Color(0xFFFFC107), // Vibrant Yellow
@@ -76,7 +58,6 @@ fun SwipeButton() {
                 color = animatedColor.value,
                 shape = RoundedCornerShape(50)
             )
-            .clickable { /* Handle Swipe Action */ }
             .padding(horizontal = 20.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center
     ) {

@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -20,6 +21,7 @@ class FirebaseAuthViewModel(context: Context) : ViewModel() {
         context = context
     )
 
+    val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
     val Auth = Firebase.auth
 
     val currentUser = Auth.currentUser
@@ -33,6 +35,7 @@ class FirebaseAuthViewModel(context: Context) : ViewModel() {
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     suspend fun signInWithGoogle(): Boolean {
+        firebaseCrashlytics.log("Singing in with Google ViewModel Triggred")
         _isLoading.value = true
         val result = googleSignInClient.signIn() // This is already suspend
         isSucess.value = result
@@ -43,6 +46,8 @@ class FirebaseAuthViewModel(context: Context) : ViewModel() {
 
     fun googleSignOut() {
         Auth.signOut()
+        firebaseCrashlytics.log("Signing out From the application using google sign out  (Viewmodel)")
+
         _isSucessfull = false
     }
 }

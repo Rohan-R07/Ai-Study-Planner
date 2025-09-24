@@ -32,73 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-//@OptIn(ExperimentalAnimationApi::class)
-//@Composable
-//fun AiTipCard(
-//    tipTitle: String = "AI Tip of the Day",
-//    tipDescription: String = "Use AI to summarize your study materials and generate quizzes to test your knowledge.",
-//    onRefresh: () -> Unit
-//) {
-//    // Glow animation (cycling through RGB)
-//    val infiniteTransition = rememberInfiniteTransition()
-//    val glowColor by infiniteTransition.animateColor(
-//        initialValue = Color(0xFF6A5ACD), // Start: purple
-//        targetValue = Color(0xFF00FFFF),  // End: cyan
-//        animationSpec = infiniteRepeatable(
-//            animation = tween(2500, easing = LinearEasing),
-//            repeatMode = RepeatMode.Reverse
-//        )
-//    )
-//
-//    Box(
-//        modifier = Modifier
-//            .padding(16.dp)
-//            .fillMaxWidth()
-//            .wrapContentHeight()
-//            .shadow(
-//                elevation = 20.dp,
-//                spotColor = glowColor,
-//                shape = RoundedCornerShape(20.dp)
-//            )
-//            .background(
-//                color = Color(0xFF1A1A2E),
-//                shape = RoundedCornerShape(20.dp)
-//            )
-//            .padding(20.dp)
-//    ) {
-//        // Refresh button top-right
-//        IconButton(
-//            onClick = onRefresh,
-//            modifier = Modifier
-//                .align(Alignment.TopEnd)
-//                .size(28.dp)
-//        ) {
-//            androidx.compose.material3.Icon(
-//                imageVector = Icons.Default.Refresh,
-//                contentDescription = "Refresh",
-//                tint = Color.White
-//            )
-//        }
-//
-//        Column {
-//            Text(
-//                text = tipTitle,
-//                style = MaterialTheme.typography.headlineSmall.copy(
-//                    color = Color.White,
-//                    fontWeight = FontWeight.Bold
-//                )
-//            )
-//            Spacer(modifier = Modifier.height(8.dp))
-//            Text(
-//                text = tipDescription,
-//                style = MaterialTheme.typography.bodyMedium.copy(
-//                    color = Color(0xFFB0B0B0)
-//                )
-//            )
-//        }
-//    }
-//}
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -108,6 +42,11 @@ fun AiTipCard(
     tipDescription: String = "Use AI to summarize your study materials and generate quizzes to test your knowledge.",
     onRefresh: () -> Unit
 ) {
+
+    val firebaseCrashlyics = FirebaseCrashlytics.getInstance()
+
+    firebaseCrashlyics.log("AITip Card")
+
     // Vibrant RGB glow animation
     val infiniteTransition = rememberInfiniteTransition()
     val glowColor by infiniteTransition.animateColor(

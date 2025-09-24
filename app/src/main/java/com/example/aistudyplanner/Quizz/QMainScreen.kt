@@ -58,6 +58,7 @@ import com.example.aistudyplanner.BottomNavigation.BottomNavBarItems
 import com.example.aistudyplanner.Gemini.GeminiViewModel
 import com.example.aistudyplanner.Recents.QuizMainScreenWithUri
 import com.example.aistudyplanner.Recents.RecentsDataStoreVM
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import org.bouncycastle.crypto.params.Blake3Parameters.context
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,6 +71,10 @@ fun QuizzMainScreen(
     application: android.app.Application,
     uriKey: String? = null
 ) {
+
+    val firebaseCrashlyics = FirebaseCrashlytics.getInstance()
+
+    firebaseCrashlyics.log("QMainScreen")
 
     val recentsvViewModel = viewModel<RecentsDataStoreVM>(
         factory =
@@ -102,15 +107,21 @@ fun QuizzMainScreen(
         val pdfLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent()
         ) { uri: Uri? ->
+            firebaseCrashlyics.log("lauching pdf selector")
+
             uri?.let { onUploadPdf(it) }
             val se = uri != null
             Log.d("SucessfullPdf", se.toString())
 
+                firebaseCrashlyics.log("checking wether PDF uri is null or not")
             if (uri != null) {
+
+                firebaseCrashlyics.log("uri is not null")
                 isPDFSelected.value = true
 
                 recentsvViewModel.addRecentPdf(uri)
             } else {
+                firebaseCrashlyics.log("uri is null")
                 isPDFSelected.value = false
             }
         }
@@ -192,6 +203,7 @@ fun QuizzMainScreen(
                         modifier = Modifier
                             .size(200.dp)
                             .clickable {
+                                firebaseCrashlyics.log("Lauching PDF selector")
                                 pdfLauncher.launch("application/pdf")
                             },
                         shape = CircleShape,
@@ -203,15 +215,17 @@ fun QuizzMainScreen(
 
                         Log.d("SucessfullPdf", isPDFSelected.value.toString())
 
+                            firebaseCrashlyics.log("checking if pdf selector is true or false")
                         if (isPDFSelected.value == true) {
+
+                            firebaseCrashlyics.log("pdf selector is true ")
                             navBackState.add(QuizzRoutes.QProcessingScreen)
                             Log.d("SucessfullPdf", "working bro")
                         } else if (isPDFSelected.value == false) {
+
+                            firebaseCrashlyics.log("pdf selector is false")
                             Log.d("SucessfullPdf", "Not working at al borther")
                         }
-
-
-
 
 
                         Column(
@@ -288,6 +302,7 @@ fun QuizzMainScreen(
             navBackState,
             backButton,
             onNavigateToProcessing = {
+                firebaseCrashlyics.log("Navigating to Processing")
                 geminiViewModel.generateQuizz()
             }
         )

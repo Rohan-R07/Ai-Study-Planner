@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.aistudyplanner.R
 import com.example.aistudyplanner.Utils.SwipeButton
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -33,6 +34,8 @@ fun OnBoardingScreen1(pageState: PagerState, totalPages: Int) {
 
     val coroutineScope = rememberCoroutineScope()
 
+    val firebaseCrashlyics = FirebaseCrashlytics.getInstance()
+    firebaseCrashlyics.log("Insider of OnBoardingScreen 1")
     Column(
         modifier = Modifier
             .fillMaxSize(),

@@ -81,6 +81,7 @@ import com.example.aistudyplanner.ui.theme.AIStudyPlannerTheme
 import com.example.aistudyplanner.ui.theme.CDotFocusedColor
 import com.example.aistudyplanner.ui.theme.CDotUnFocusedColour
 import com.google.firebase.ai.type.content
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.delay
 
 class YtSummari : ComponentActivity() {
@@ -88,6 +89,11 @@ class YtSummari : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
+
+        firebaseCrashlytics.log("helper function in order to get pdf name and preview")
+
 
         val geminiViewModel = viewModels<GeminiViewModel>(
             factoryProducer = {
@@ -136,7 +142,6 @@ class YtSummari : ComponentActivity() {
                     var errorMessage by remember { mutableStateOf("") }
 
                     val context = LocalContext.current
-
 
                     Log.d("GoogleAi", summary.toString())
 
@@ -260,6 +265,9 @@ class YtSummari : ComponentActivity() {
                                         },
                                         trailingIcon = {
                                             if (youtubeUrl.isNotEmpty()) {
+
+                                                firebaseCrashlytics.log("helper function in order to get pdf name and preview")
+
                                                 IconButton(
                                                     onClick = {
                                                         youtubeUrl = ""
@@ -284,6 +292,8 @@ class YtSummari : ComponentActivity() {
 
                                     // Error message
                                     if (errorMessage.isNotEmpty()) {
+
+                                        firebaseCrashlytics.log("error message log for failing to get the value")
                                         Text(
                                             text = errorMessage,
                                             color = MaterialTheme.colorScheme.error,

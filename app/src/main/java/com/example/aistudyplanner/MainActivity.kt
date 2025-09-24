@@ -35,10 +35,14 @@ import com.example.aistudyplanner.Gemini.GeminiViewModel
 import com.example.aistudyplanner.MainNavigation.MRoutes
 import com.example.aistudyplanner.MainNavigation.MainNavigation
 import com.example.aistudyplanner.ui.theme.AIStudyPlannerTheme
+import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
 
         val geminiViewModel = viewModels<GeminiViewModel>(
             factoryProducer = {
@@ -72,6 +76,7 @@ class MainActivity : ComponentActivity() {
                 val mainNavBackStack = rememberNavBackStack<MRoutes>(MRoutes.SplashScreen)
                 Scaffold(modifier = Modifier.fillMaxSize().background(Red)) { innerPadding ->
 
+                    firebaseCrashlytics.log("Inside of Recents File")
 
                     MainNavigation(
                         mainNavBackStack,

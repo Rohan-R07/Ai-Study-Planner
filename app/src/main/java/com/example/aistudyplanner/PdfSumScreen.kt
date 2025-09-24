@@ -82,12 +82,12 @@ import com.example.aistudyplanner.Recents.DirectUriPdfSummarizerScreen
 import com.example.aistudyplanner.Recents.RecentsDataStoreVM
 import com.example.aistudyplanner.Utils.generatePdfPreview
 import com.example.aistudyplanner.Utils.getPdfFileName
-import com.example.aistudyplanner.pdfExtaction.PdfFilePicker
 import com.example.aistudyplanner.ui.theme.AIStudyPlannerTheme
 import com.example.aistudyplanner.ui.theme.CBackground
 import com.example.aistudyplanner.ui.theme.CDotFocusedColor
 import com.example.aistudyplanner.ui.theme.CDotUnFocusedColour
 import com.google.firebase.ai.type.content
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
 import kotlinx.coroutines.Dispatchers
@@ -114,6 +114,8 @@ class PdfSumScreen : ComponentActivity() {
                         }
                     }
                 })
+
+            val firebaseCrashlyics = FirebaseCrashlytics.getInstance()
 
             val value = intent.getStringExtra("URI_KEY") // Replace with the appropriate type
 
@@ -148,10 +150,15 @@ class PdfSumScreen : ComponentActivity() {
             AIStudyPlannerTheme {
                 if (isURIpresent.value == null) {
 
+                    firebaseCrashlyics.log("uri is not present and it is null")
+
                     val pdfPickerLauncher = rememberLauncherForActivityResult(
                         contract = ActivityResultContracts.OpenDocument(), onResult = { uri ->
 
                             if (uri != null) {
+
+                                firebaseCrashlyics.log("uri is not equal to null")
+
                                 context.contentResolver.takePersistableUriPermission(
                                     uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
                                 )
@@ -161,6 +168,7 @@ class PdfSumScreen : ComponentActivity() {
                                 geminiViewModel.value.setPdfUri(uri)
                             }
                             uri?.let {
+                                firebaseCrashlyics.log("uri is equal to null")
                                 selectedPdfUri = it
                                 pdfName = getPdfFileName(context, it)
 
@@ -232,7 +240,6 @@ class PdfSumScreen : ComponentActivity() {
 
                                     ) {
 
-
                                         Column(
                                             modifier = Modifier
                                                 .padding(20.dp)
@@ -265,6 +272,8 @@ class PdfSumScreen : ComponentActivity() {
 
                                             Button(
                                                 onClick = {
+                                                    firebaseCrashlyics.log("Launching PDF selector")
+
                                                     pdfPickerLauncher.launch(arrayOf("application/pdf"))
                                                 },
                                                 modifier = Modifier
@@ -374,6 +383,8 @@ class PdfSumScreen : ComponentActivity() {
 
                                                             Button(
                                                                 onClick = {
+                                                                    firebaseCrashlyics.log("Triggring extract and summarization functino")
+
                                                                     geminiViewModel.value.extractAndSummarize()
                                                                 },
                                                                 modifier = Modifier.fillMaxWidth(),
@@ -381,6 +392,8 @@ class PdfSumScreen : ComponentActivity() {
                                                                 shape = RoundedCornerShape(8.dp)
                                                             ) {
                                                                 if (isLoading) {
+                                                                    firebaseCrashlyics.log(" extract and summarization is loading")
+
                                                                     CircularProgressIndicator(
                                                                         modifier = Modifier
                                                                             .size(20.dp),
@@ -394,6 +407,8 @@ class PdfSumScreen : ComponentActivity() {
                                                                     )
                                                                     Text("Generating Summary...")
                                                                 } else {
+
+                                                                    firebaseCrashlyics.log(" extract and summarization failed")
                                                                     Icon(
                                                                         imageVector = Icons.Default.Add,
                                                                         contentDescription = "Summarize",
@@ -424,10 +439,11 @@ class PdfSumScreen : ComponentActivity() {
                             item {
 
 
-                                if (summaryResonse.value.toString()
-                                        .isNotEmpty() && summaryResonse.value.toString() != "null"
+                                if (summaryResonse.value.toString().isNotEmpty() && summaryResonse.value.toString() != "null"
+
                                 ) {
 
+                                    firebaseCrashlyics.log("summarize response is not empty")
 
                                     Spacer(modifier = Modifier.height(24.dp))
 
@@ -466,6 +482,7 @@ class PdfSumScreen : ComponentActivity() {
                                                 Button(
                                                     modifier = Modifier,
                                                     onClick = {
+                                                        firebaseCrashlyics.log("triggering clipboard manager is the response is not empty")
                                                         if (summaryResonse.value.toString()
                                                                 .isNotEmpty()
                                                         ) {
@@ -493,6 +510,8 @@ class PdfSumScreen : ComponentActivity() {
                                                 }
 
                                                 if (showCopySuccess) {
+                                                    firebaseCrashlyics.log("showing sucessfull copied to clip board")
+
                                                     LaunchedEffect(showCopySuccess) {
                                                         delay(2000)
                                                         showCopySuccess = false
@@ -520,6 +539,7 @@ class PdfSumScreen : ComponentActivity() {
 
                 }else{
 
+                    firebaseCrashlyics.log("IN case uri is issed from the home screen from the Datastore of Recents")
 
                     DirectUriPdfSummarizerScreen(
                         pdfUri = isURIpresent.value!!.toUri(),

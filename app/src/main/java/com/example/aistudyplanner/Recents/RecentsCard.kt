@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.aistudyplanner.R
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 @Composable
 fun RecentsCard(
@@ -40,7 +41,7 @@ fun RecentsCard(
     icon: Int = R.drawable.pdf_image
 ) {
 
-
+    val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
     // Individual Recent File Card
 
     Card(
@@ -49,6 +50,7 @@ fun RecentsCard(
             .fillMaxWidth()
             .height(90.dp)
             .clickable {
+                firebaseCrashlytics.log("Recents card onCLick from home screen")
                 onFileClick(recentFile)
             },
         colors = CardDefaults.cardColors(
@@ -106,16 +108,3 @@ fun RecentsCard(
 
 }
 
-
-@Preview
-@Composable
-private fun DEGdE() {
-    RecentsCard(
-        RecentsPdf(
-            uri = "fege",
-            name = "BioGraphy of Rohvvvv rgfver gre gbvr erhg erhgr gw  an",
-            openedAt = 904343L,
-        )
-    )
-
-}

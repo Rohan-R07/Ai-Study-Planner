@@ -45,6 +45,7 @@ import com.example.aistudyplanner.YtSummari
 
 import com.example.aistudyplanner.ui.theme.CBackground
 import com.example.aistudyplanner.ui.theme.CDotFocusedColor
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlin.jvm.java
 
 @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
@@ -55,6 +56,8 @@ fun MainScreens(
     application: Application,
     mainBackstack: NavBackStack
 ) {
+
+    val firebaeCrashlytics = FirebaseCrashlytics.getInstance()
 
     val bottomNavBackStack = rememberNavBackStack<BRoutes>(BRoutes.HomeScreen)
 
@@ -76,6 +79,8 @@ fun MainScreens(
         modifier = Modifier
             .fillMaxSize(),
         floatingActionButton = {
+
+            firebaeCrashlytics.log("Triggring Epandable Floating Action button")
 
             ExpandableFloatingActionButton(
                 fabActions = listOf(
@@ -104,7 +109,7 @@ fun MainScreens(
                 containerColor = CBackground,
                 tonalElevation = 2.dp
             ) {
-
+                firebaeCrashlytics.log("Main Screen Navigatin Bar triggred")
                 bottomNavBarItems.forEachIndexed { index, item ->
                     val isSelected = navIndex.value == index
                     NavigationBarItem(
@@ -112,6 +117,9 @@ fun MainScreens(
                             .width(40.dp),
                         selected = navIndex.value == index,
                         onClick = {
+
+                            firebaeCrashlytics.log("Clickling Navigation Item $index in main screen")
+
                             navIndex.value = index
                             bottomNavBackStack.removeAll { true }
                             bottomNavBackStack.add(item.navRoute)

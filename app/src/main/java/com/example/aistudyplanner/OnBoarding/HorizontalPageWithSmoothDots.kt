@@ -25,6 +25,7 @@ import com.example.aistudyplanner.FirebaseAuth.FirebaseAuthViewModel
 import com.example.aistudyplanner.ui.theme.CBackground
 import com.example.aistudyplanner.ui.theme.CDotFocusedColor
 import com.example.aistudyplanner.ui.theme.CDotUnFocusedColour
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -34,10 +35,11 @@ fun HorizontalPagerWithSmoothDots(firebaseAuthViewModel: FirebaseAuthViewModel,m
 
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { pageCount })
 
+    val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
+
     Column(
         modifier = Modifier
             .background(CBackground)
-
             .fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -49,6 +51,9 @@ fun HorizontalPagerWithSmoothDots(firebaseAuthViewModel: FirebaseAuthViewModel,m
             modifier = Modifier.padding(16.dp)
         ) {
             repeat(pageCount) { index ->
+
+                firebaseCrashlytics.log("reapeating")
+
                 val isSelected = pagerState.currentPage == index
                 val color by animateColorAsState(
                     targetValue = if (isSelected) CDotFocusedColor else CDotUnFocusedColour,
@@ -77,22 +82,25 @@ fun HorizontalPagerWithSmoothDots(firebaseAuthViewModel: FirebaseAuthViewModel,m
         ) { page ->
 
             when (page) {
-                0 -> OnBoardingScreen1(pagerState, page)
-                1 -> OnBoardingScreen2(pagerState, page)
-                2 -> OnBoardingScreen3(
-                    firebaseAuthViewModel,
-                    mainNavBackStack = mainNavBackStack,
-                )
+                0 -> {
+                    OnBoardingScreen1(pagerState, page)
+                    firebaseCrashlytics.log("Going to onBoardingScreen 1")
+                }
+                1 -> {
+                    OnBoardingScreen2(pagerState, page)
+                    firebaseCrashlytics.log("Going to onBoardingScreen 2")
+                }
+                2 -> {
+                    OnBoardingScreen3(
+                        firebaseAuthViewModel,
+                        mainNavBackStack = mainNavBackStack,
+                    )
 
-
+                    firebaseCrashlytics.log("Going to onBoardingScreen 3")
+                }
             }
-
-
-
         }
-
         // Smooth Dots Indicator
-
     }
 }
 

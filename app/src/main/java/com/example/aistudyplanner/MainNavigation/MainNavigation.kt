@@ -28,6 +28,7 @@ import com.example.aistudyplanner.Gemini.GeminiViewModel
 import com.example.aistudyplanner.OnBoarding.HorizontalPagerWithSmoothDots
 import com.example.aistudyplanner.Screeens.MainScreens
 import com.example.aistudyplanner.Screeens.SplashScreen
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
@@ -41,11 +42,12 @@ fun MainNavigation(
 ) {
     val current = mainNavbackStack.lastOrNull()
 
+    val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
+
     NavDisplay(
         modifier = Modifier.fillMaxSize(),
         backStack = mainNavbackStack,
         onBack = {
-
             if (current is MRoutes.SettingsScreen) {
                 mainNavbackStack.add(MRoutes.MainScreen)
             } else {
@@ -73,6 +75,8 @@ fun MainNavigation(
         entryProvider = entryProvider {
 
             entry<MRoutes.SplashScreen> {
+                firebaseCrashlytics.log("Starting with spalsh Screeen")
+
                 SplashScreen(
                     mainNavbackStack,
                     firebaseAuthViewModel = firebaseAuthViewModel
@@ -81,6 +85,8 @@ fun MainNavigation(
 
 
             entry<MRoutes.OnBoardingScreen> {
+                firebaseCrashlytics.log("Starting with OnBaording Screen")
+
                 HorizontalPagerWithSmoothDots(
                     firebaseAuthViewModel = firebaseAuthViewModel,
                     mainNavbackStack
@@ -88,6 +94,8 @@ fun MainNavigation(
             }
 
             entry<MRoutes.MainScreen> {
+                firebaseCrashlytics.log("Starting with Main Screen")
+
 
                 MainScreens(
                     geminiViewModel,
@@ -97,6 +105,8 @@ fun MainNavigation(
             }
 
             entry<MRoutes.SettingsScreen> {
+                firebaseCrashlytics.log("Starting with Setting screen")
+
                 SettingsScreen(
                     mainBackStack = mainNavbackStack
                 )

@@ -67,6 +67,7 @@ import com.example.aistudyplanner.Gemini.GeminiViewModel
 import com.example.aistudyplanner.Quizz.QuizzRoutes
 import com.example.aistudyplanner.Utils.generatePdfPreview
 import com.example.aistudyplanner.Utils.getPdfFileName
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,9 +94,13 @@ fun QuizMainScreenWithUri(
         }
     )
 
+    val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
+
     // Initialize PDF data when screen loads
     LaunchedEffect(pdfUri) {
         try {
+
+            firebaseCrashlytics.log("Uploading pdf uri for summarization")
             // Set the PDF URI in the ViewModel
             geminiViewModel.setPdfUri(pdfUri)
 
@@ -109,6 +114,7 @@ fun QuizMainScreenWithUri(
 
             isLoadingPreview = false
         } catch (e: Exception) {
+            firebaseCrashlytics.log("Uploading of pdf file for summarization failed")
             Log.e("QuizMainScreen", "Error loading PDF: ${e.message}")
             isLoadingPreview = false
         }
@@ -121,7 +127,10 @@ fun QuizMainScreenWithUri(
                 title = { },
                 navigationIcon = {
                     IconButton(
-                        onClick = { backButton.invoke() }
+                        onClick = { backButton.invoke()
+                            firebaseCrashlytics.log("Back button failed")
+
+                        }
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
@@ -176,6 +185,8 @@ fun QuizMainScreenWithUri(
             ) {
                 if (isLoadingPreview) {
                     // Loading state
+                    firebaseCrashlytics.log("Laoding Prev for pdf")
+
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -242,6 +253,9 @@ fun QuizMainScreenWithUri(
                             contentAlignment = Alignment.Center
                         ) {
                             pdfPreviewBitmap?.let { bitmap ->
+
+                                firebaseCrashlytics.log("Reciving Previow for the selected pdf")
+
                                 Image(
                                     bitmap = bitmap.asImageBitmap(),
                                     contentDescription = "PDF Preview",
@@ -288,6 +302,8 @@ fun QuizMainScreenWithUri(
             ) {
                 Button(
                     onClick = {
+                        firebaseCrashlytics.log("Triggred Generate Quizz button")
+
                         navBackState.add(QuizzRoutes.QProcessingScreen)
                         onNavigateToProcessing.invoke()
                     },

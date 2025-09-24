@@ -73,6 +73,7 @@ import com.example.aistudyplanner.Utils.getPdfFileName
 import com.example.aistudyplanner.ui.theme.CBackground
 import com.example.aistudyplanner.ui.theme.CDotFocusedColor
 import com.example.aistudyplanner.ui.theme.CDotUnFocusedColour
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,6 +83,8 @@ fun DirectUriPdfSummarizerScreen(
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+
+    val firebaseCrashlyics = FirebaseCrashlytics.getInstance()
 
     // State variables
     var pdfName by remember { mutableStateOf("") }
@@ -95,6 +98,8 @@ fun DirectUriPdfSummarizerScreen(
     // Initialize PDF data when screen loads
     LaunchedEffect(pdfUri) {
         // Set the PDF URI in the ViewModel
+        firebaseCrashlyics.log("setting the pdf URI for summarization insider of pdf quizz uri setter")
+
         geminiViewModel.value.setPdfUri(pdfUri)
 
         // Get PDF name
@@ -213,6 +218,8 @@ fun DirectUriPdfSummarizerScreen(
                         // Generate Summary Button
                         Button(
                             onClick = {
+
+                                firebaseCrashlyics.log("triggered extraction and summarization function backend")
                                 geminiViewModel.value.extractAndSummarize()
                             },
                             modifier = Modifier
@@ -258,6 +265,8 @@ fun DirectUriPdfSummarizerScreen(
             // Summary Results Section
             item {
                 if (summaryResponse?.isNotEmpty() == true && summaryResponse != "null") {
+
+                    firebaseCrashlyics.log("is summaryResponse is true and summary Response is not equal to null")
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -356,6 +365,7 @@ fun DirectUriPdfSummarizerScreen(
 
             // Loading state when generating summary
             if (isLoading && (summaryResponse?.isEmpty() == true || summaryResponse == "null")) {
+                firebaseCrashlyics.log("if loading and summaryReponse is true or summaryReponse equal to null")
                 item {
                     Card(
                         modifier = Modifier

@@ -38,6 +38,7 @@ import com.example.aistudyplanner.ui.theme.CBackground
 import com.example.aistudyplanner.ui.theme.CDotFocusedColor
 import com.example.aistudyplanner.ui.theme.CDotUnFocusedColour
 import com.example.aistudyplanner.ui.theme.Pink40
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 
 @Composable
@@ -52,7 +53,9 @@ fun McqCard(
 
 ) {
     var selectedOption by rememberSaveable (index) { mutableStateOf<String?>(null) }
+    val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
 
+    firebaseCrashlytics.log("pdf selector is true ")
 
     Card(
         modifier = modifier
@@ -72,6 +75,7 @@ fun McqCard(
             Text(text = question, style = MaterialTheme.typography.titleMedium, color = White)
 
             options.forEachIndexed { optionIndex, option ->
+                firebaseCrashlytics.log("Displaying questions / options")
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier

@@ -101,9 +101,13 @@ import com.example.aistudyplanner.QuizzScreen
 import com.example.aistudyplanner.ui.theme.CBackground
 import com.example.aistudyplanner.ui.theme.CDotFocusedColor
 import com.example.aistudyplanner.ui.theme.CDotUnFocusedColour
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.bouncycastle.jcajce.provider.asymmetric.ec.SignatureSpi
+
+
+val firebaseCrashlyics = FirebaseCrashlytics.getInstance()
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -114,6 +118,7 @@ fun QuizzPannel(
 
     val context = LocalContext.current
 
+
     val geminiViewMoedl = viewModel<GeminiViewModel>(factory = object : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return GeminiViewModel(context) as T
@@ -123,8 +128,6 @@ fun QuizzPannel(
     val quizz = geminiViewMoedl.quizState.collectAsState()
 
     val correctness = remember { mutableStateMapOf<Int, Int>() }
-
-    val answers = remember { mutableStateMapOf<Int, String?>() }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(), topBar = {
@@ -143,6 +146,7 @@ fun QuizzPannel(
                 ), navigationIcon = {
                     IconButton(
                         onClick = {
+                            firebaseCrashlyics.log("Creating Goinng back from Quizz Pannel to the Upload PDF screen ")
                             navBackStackEntry.remove(QuizzRoutes.QuizzPannel)
                         }) { }
                 })
@@ -205,6 +209,7 @@ fun QuizzPannel(
                             ) {
 
                                 itemsIndexed(quizz.value?.questions ?: emptyList()) { index, question ->
+                                    firebaseCrashlyics.log("MCQ Card Generation (questions)")
 
                                     Log.d("QUestion", question.question)
 
@@ -242,9 +247,13 @@ fun QuizzPannel(
 
                         item {
                             Row {
+
                                 // Previous Button
                                 Button(
                                     onClick = {
+
+                                        firebaseCrashlyics.log("For Previous button inside of MCQ options and questions CARD")
+
                                         if (currentSteps.value > 1) {
                                             val targetIndex =
                                                 currentSteps.value - 2 // because steps are 1-based
@@ -278,6 +287,8 @@ fun QuizzPannel(
                                 // Next Button
                                 Button(
                                     onClick = {
+
+                                        firebaseCrashlyics.log("Next button Inside of MCQ card")
 
                                         if (!kindOffWorking) {
 
@@ -366,8 +377,6 @@ fun QuizzPannel(
                                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 }
                                 ContextCompat.startActivity(context, intent, null)
-
-//                                exitQuizz.invoke()
                             }
                         )
                     }
@@ -392,6 +401,8 @@ fun SegmentedProgressBar(
         modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
     ) {
         repeat(totalSegments) { index ->
+
+            firebaseCrashlyics.log("Progress Indication for the MCQs")
             val shape = when (index) {
                 0 -> RoundedCornerShape(topStart = 10.dp, bottomStart = 10.dp) // First block
                 totalSegments - 1 -> RoundedCornerShape(

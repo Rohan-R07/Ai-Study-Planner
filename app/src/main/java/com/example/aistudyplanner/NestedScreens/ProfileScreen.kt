@@ -67,9 +67,9 @@ import com.example.aistudyplanner.BottomNavigation.BRoutes
 import com.example.aistudyplanner.FirebaseAuth.FirebaseAuthViewModel
 import com.example.aistudyplanner.MainNavigation.MRoutes
 import com.example.aistudyplanner.R
-import com.example.aistudyplanner.Utils.placeholderList
 import com.example.aistudyplanner.ui.theme.CBackground
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,6 +83,7 @@ fun ProfileScreen(
 
     val context = LocalContext.current
 
+    val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
 
     val firebaseAuth = viewModel<FirebaseAuthViewModel>(
         factory = object : ViewModelProvider.Factory {
@@ -119,6 +120,7 @@ fun ProfileScreen(
                 },
                 actions = {
                     IconButton(onClick = {
+                        firebaseCrashlytics.log("Pressing Back to Settings from profile screen")
 
                         mainBackStack.add(MRoutes.SettingsScreen)
 
@@ -174,10 +176,14 @@ fun ProfileScreen(
 //                        Toast.makeText(context,"Loading Profile Picture", Toast.LENGTH_SHORT).show()
                             isImageLoaded.value = true
 
+                            firebaseCrashlytics.log("Profile Image Loading")
+
+
                         }
                     )
 
                     if (isImageLoaded.value) {
+                        firebaseCrashlytics.log("Profile Image Loading Finished")
 
                         CircularProgressIndicator()
                         isImageLoaded.value = false
@@ -217,6 +223,7 @@ fun ProfileScreen(
                     Spacer(modifier = Modifier.padding(10.dp))
 
                     if (isEmailVerified == true) {
+                        firebaseCrashlytics.log("email is verified")
 
                         androidx.compose.material3.Icon(
                             painter = painterResource(R.drawable.tick),
@@ -231,16 +238,14 @@ fun ProfileScreen(
 
                 Spacer(modifier = Modifier.height(40.dp))
 
-
-
-
                 Spacer(modifier = Modifier.height(30.dp))
 
                 // Sign out button
 
                 Button(
                     onClick = {
-                        // TODO sign Out button
+                        firebaseCrashlytics.log("Signing OUT Button")
+
                         firebaseAuth.googleSignOut()
 
                         if (!isSignOutGoogle.value) {

@@ -81,10 +81,10 @@ import com.example.aistudyplanner.Recents.RecentsCard
 import com.example.aistudyplanner.Recents.RecentsDataStoreVM
 import com.example.aistudyplanner.Recents.RecentsPdf
 import com.example.aistudyplanner.Utils.AiTipCard
-import com.example.aistudyplanner.Utils.placeholderList
 
 import com.example.aistudyplanner.ui.theme.CBackground
 import com.example.aistudyplanner.ui.theme.CDotFocusedColor
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -93,6 +93,8 @@ fun HomeScreen(
     geminiViewModel: GeminiViewModel,
     application: Application
 ) {
+
+    val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
 
     val bottmSheetState = rememberModalBottomSheetState()
 
@@ -111,7 +113,6 @@ fun HomeScreen(
     )
     geminiViewModel.aiTipOfTheDay() // has to commented after some time
 
-    val recentPdf = remember { mutableStateOf<RecentsPdf?>(null) }
 
     Scaffold(
         modifier = Modifier
@@ -131,6 +132,7 @@ fun HomeScreen(
                 tipDescription = tipResponse.value.toString()
             ) {
                 refreshButton.value = true
+                firebaseCrashlytics.log(" Ai Tip card Refresh Button ")
             }
 
             val isTipLoading = remember { mutableStateOf(false) }
@@ -140,6 +142,7 @@ fun HomeScreen(
                 LaunchedEffect(Unit) {
                 geminiViewModel.aiTipOfTheDay()
                     refreshButton.value = false
+                    firebaseCrashlytics.log(" Ai Tip card Refresh Button launched Effects")
 
                 }
             }
@@ -163,6 +166,8 @@ fun HomeScreen(
 
                     FilledTonalButton(
                         onClick = {
+                            firebaseCrashlytics.log(" HOme screen Clear button")
+
                             recentsvViewModel.clearRecents()
                         },
                         colors = ButtonDefaults.buttonColors(
@@ -193,6 +198,7 @@ fun HomeScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
 
                         ) {
+                            firebaseCrashlytics.log("No Recents")
 
 
                             Image(
@@ -215,6 +221,7 @@ fun HomeScreen(
                     }
                 } else {
 
+                    firebaseCrashlytics.log("Recents Present")
 
                     items(listings.value) { item ->
                         val recentsPDFs = remember { mutableStateOf<RecentsPdf?>(null) }
@@ -240,6 +247,9 @@ fun HomeScreen(
                         val context = LocalContext.current
 
                         if (showBottomSheet) {
+                            firebaseCrashlytics.log("Showing bottom sheet for Summarization/Quizz Generation ")
+
+
                             ModalBottomSheet(
                                 onDismissRequest = {
                                     showBottomSheet = false
@@ -280,6 +290,9 @@ fun HomeScreen(
                                             openedAt = 343434L
                                         ),
                                         onFileClick = { recentsPDF ->
+                                            firebaseCrashlytics.log("Choosing Summarize card for summarixation of the recents pdf")
+
+
                                             val intent = Intent(
                                                 context,
                                                 PdfSumScreen::class.java
@@ -315,6 +328,7 @@ fun HomeScreen(
                                             openedAt = 343434L,
                                         ),
                                         onFileClick = { recentsPDF ->
+                                            firebaseCrashlytics.log("Choosing generate quizz card for summarixation of the recents pdf")
 
                                             val intent = Intent(
                                                 context,

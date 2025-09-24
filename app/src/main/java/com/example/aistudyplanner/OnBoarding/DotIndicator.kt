@@ -16,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.firebase.FirebaseCommonRegistrar
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 @Composable
 fun DotIndicator(pagerState: PagerState, pageCount: Int) {
@@ -24,7 +26,11 @@ fun DotIndicator(pagerState: PagerState, pageCount: Int) {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(16.dp)
     ) {
+         val firebaseCrashlyics = FirebaseCrashlytics.getInstance()
+
+        firebaseCrashlyics.log("Insider of dot indicator")
         repeat(pageCount) { index ->
+
             val isSelected = pagerState.currentPage == index
             Box(
                 modifier = Modifier
@@ -39,10 +45,3 @@ fun DotIndicator(pagerState: PagerState, pageCount: Int) {
 
 }
 
-@Preview
-@Composable
-private fun DNEFOEEF() {
-    val pagerState = rememberPagerState(initialPage = 0, pageCount = { 3 })
-    val pageCount = 3
-    DotIndicator(pagerState, pageCount)
-}

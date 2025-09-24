@@ -51,6 +51,7 @@ import com.example.aistudyplanner.ui.theme.CDotFocusedColor
 import com.example.aistudyplanner.ui.theme.SignInWIthEmail
 import com.example.aistudyplanner.ui.theme.SignInWithGoogle
 import com.google.firebase.ai.type.content
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.logger.Logger
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -68,6 +69,8 @@ fun OnBoardingScreen3(viewModel: FirebaseAuthViewModel, mainNavBackStack: NavBac
 
     val isLoading = viewModel._isLoading.collectAsState().value
 
+    val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
+
     val courutine = rememberCoroutineScope()
     Column(
         modifier = Modifier
@@ -76,7 +79,6 @@ fun OnBoardingScreen3(viewModel: FirebaseAuthViewModel, mainNavBackStack: NavBac
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
 
         Text(
             text = "Let's Get Started",
@@ -113,9 +115,11 @@ fun OnBoardingScreen3(viewModel: FirebaseAuthViewModel, mainNavBackStack: NavBac
 
         Button(
             onClick = {
+                firebaseCrashlytics.log("Signing in with google button triggred")
                 courutine.launch {
                     val success = viewModel.signInWithGoogle()
                     if (success) {
+                        firebaseCrashlytics.log("Singing in with google Sucessfull navigating")
                         mainNavBackStack.clear()
                         mainNavBackStack.add(MRoutes.MainScreen)
                     }
@@ -138,6 +142,7 @@ fun OnBoardingScreen3(viewModel: FirebaseAuthViewModel, mainNavBackStack: NavBac
     }
 
     if (isLoading){
+        firebaseCrashlytics.log("Signing in with google is Loading")
         CircularProgressIndicator()
     }
 
