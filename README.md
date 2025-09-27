@@ -101,8 +101,8 @@ Once onboarding is complete, the login screen allows users to securely sign in a
 - **Onboarding Screens:** Highlight app benefits and setup steps.  
 - **Login Screen:** Provides secure authentication (email/password or third-party login).
 
+![OnboarindScreenandLogin-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/2009759a-8dc3-4909-9b2d-c28b8d9bbcbf)
 
-// TODO File size is big so please do wait
 ---
 
 ## 🤖 AI Tip of the Day (Video 📽️)
