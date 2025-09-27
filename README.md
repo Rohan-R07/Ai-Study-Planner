@@ -72,6 +72,33 @@
 - **Settings** (language, version, issues, sign-out)  
 
 ---
+## 📱 Onboarding & Login Screens
+
+Below is a quick preview of the onboarding flow combined with the login screen:
+
+**Description:**  
+The onboarding flow introduces new users to the main features of the AI Study Planner application.  
+Once onboarding is complete, the login screen allows users to securely sign in and access their personalized study dashboard.  
+
+- **Onboarding Screens:** Highlight app benefits and setup steps.  
+- **Login Screen:** Provides secure authentication (email/password or third-party login).
+
+  // to uploade gif now it is kindoff big
+---
+
+## 🤖 AI Tip of the Day
+
+This feature provides users with a fresh **AI-generated tip** every time the application is launched, powered by **Gemini AI**.  
+The tips are designed to keep users motivated and improve their study habits with smart, personalized advice.
+
+
+**Description:**  
+- Displayed inside a **glowing animated RGB card** that continuously pulses with light.  
+- Includes a **refresh button** with an RGB glow effect.  
+- On pressing the refresh button, a **new AI tip is instantly generated**.  
+
+// todo add gif now the file size is big so doing this stuff
+
 
 ## ⚙️ Setup & Installation
 
@@ -103,13 +130,6 @@ cd AI-Study-Planner
 
 ---
 
-### 4. Run the App
-
-- Open in **Android Studio (Giraffe or newer)**.  
-- Sync Gradle.  
-- Run on device (**6.8-inch screen recommended**).  
-
----
 
 ## 📊 Crashlytics & Logging
 
@@ -132,24 +152,19 @@ cd AI-Study-Planner
 
 ## 🚨 Known Issues
 
-- App may crash if Gemini Free Tier quota is exceeded.
+- App may crash if Gemini Free Tier quota is exceeded (better generate your own API key).
 - Requires API key refresh in Firebase AI Logic.
 
 ---
-
-## 📦 Roadmap
-
-- [ ] Add Dark Mode toggle
-- [ ] Offline AI (ML Kit on-device)
-- [ ] Export quiz results as PDF
-- [ ] Push notifications for reminders
+## The screenshot below shows the home screen of the AI Study Planner application
 
 ---
 
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome!  
-Fork the repo and submit a PR.
+
+Fork the repo and submit a PR on my linkedn or Email.
 
 ---
 
