@@ -70,6 +70,26 @@
 - **Settings** (language, version, issues, sign-out)  
 
 ---
+
+
+## Splash Screen
+
+Our **animated Splash Screen** delivers an engaging first impression of **AI Study Planner**. It elegantly showcases the app title:
+
+**AI - Study Planner**  
+*“Learning Reinvented”*
+
+The splash screen also handles smart navigation:
+
+- If the user is **already logged in**, they are seamlessly redirected to the **Home Screen**.  
+- If the user is **not logged in**, they are taken to the **Onboarding Screen**.  
+
+This animated entry point sets the tone for an intuitive and modern learning experience right from the start.
+
+
+![SplashScreen-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/7add203f-88df-491f-b954-a6c31a701a3f)
+
+---
 ## 📱 Onboarding & Login Screens (Video 📽️)
 
 Below is a quick preview of the onboarding flow combined with the login screen:
