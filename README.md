@@ -1,3 +1,4 @@
+
 # 📘 AI Study Planner
 
 ![Made with Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-3DDC84?style=for-the-badge&logo=jetpackcompose&logoColor=white)
